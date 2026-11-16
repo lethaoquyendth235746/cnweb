@@ -1,0 +1,20 @@
+# Thông tin bảo mật
+.env
+.env.*
+!.env.example
+
+# File hệ thống
+.DS_Store
+Thumbs.db
+
+# File log và tạm
+*.log
+*.tmp
+
+# File backup
+*.bak
+
+# Database cá nhân
+*.sqlite
+*.sqlite3
+*.db
