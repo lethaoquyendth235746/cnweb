@@ -1,10 +1,10 @@
 <?php
 class DATABASE{
-    private static $dns = "mysql:host=localhost;dbname=shop;port=3306";
+    private static $dns = "mysql:host=localhost;dbname=xag_store;port=3306";
     private static $username = "root";
     private static $password = "";
     private static $options = array(PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION, 
-                                    PDO::MYSQL_ATTR_INIT_COMMAND=>"SET NAMES utf8");    
+                                    PDO::MYSQL_ATTR_INIT_COMMAND=>"SET NAMES utf8mb4");    
     private static $db;
     
     private function __construct(){} 

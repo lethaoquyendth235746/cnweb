@@ -35,12 +35,38 @@ switch($action){
             $madm = $_REQUEST["id"];
             $dmuc = $dm->laydanhmuctheoid($madm);
             $tendm =  $dmuc["tendanhmuc"];   
-            $mathang = $mh->laymathangtheodanhmuc($madm);
+            $sort = isset($_REQUEST["sort"]) ? $_REQUEST["sort"] : null;
+            $mathang = $mh->laymathangtheodanhmucvasapxep($madm, $sort);
             include("group.php");
         }
         else{
             include("main.php");
         }
+        break;
+    case "dongmay": 
+        if(isset($_REQUEST["model"])){
+            $model = trim($_REQUEST["model"]);
+            $tendm = "Linh kiện tương thích dòng: XAG " . htmlspecialchars($model);
+            $sort = isset($_REQUEST["sort"]) ? $_REQUEST["sort"] : null;
+            $mathang = $mh->laymathangtheodongmay($model, $sort);
+            include("group.php");
+        }
+        else{
+            include("main.php");
+        }
+        break;
+    case "search": 
+        $tukhoa = isset($_REQUEST["tukhoa"]) ? trim($_REQUEST["tukhoa"]) : "";
+        $tendm = "Kết quả tìm kiếm cho: \"" . htmlspecialchars($tukhoa) . "\"";
+        $sort = isset($_REQUEST["sort"]) ? $_REQUEST["sort"] : null;
+        $mathang = $mh->timkiemmathang($tukhoa, $sort);
+        include("group.php");
+        break;
+    case "gioithieu":
+        include("gioithieu.php");
+        break;
+    case "lienhe":
+        include("lienhe.php");
         break;
     case "detail": 
         if(isset($_GET["id"])){

@@ -211,5 +211,75 @@ class MATHANG{
         }
     }
 
+    // Tìm kiếm mặt hàng theo từ khóa
+    public function timkiemmathang($tukhoa, $sort = null){
+        $dbcon = DATABASE::connect();
+        try{
+            $order = "ORDER BY id DESC";
+            if($sort == "gia_tang") $order = "ORDER BY giaban ASC";
+            elseif($sort == "gia_giam") $order = "ORDER BY giaban DESC";
+
+            $sql = "SELECT * FROM mathang 
+                    WHERE tenmathang LIKE :tukhoa 
+                       OR mota LIKE :tukhoa 
+                       OR dongmay LIKE :tukhoa 
+                    $order";
+            $cmd = $dbcon->prepare($sql);
+            $cmd->bindValue(":tukhoa", "%" . $tukhoa . "%");
+            $cmd->execute();
+            return $cmd->fetchAll();
+        }
+        catch(PDOException $e){
+            $error_message = $e->getMessage();
+            echo "<p>Lỗi truy vấn: $error_message</p>";
+            exit();
+        }
+    }
+
+    // Lấy mặt hàng theo dòng máy (P100, P100 Pro, P40, V40, R150)
+    public function laymathangtheodongmay($dongmay, $sort = null){
+        $dbcon = DATABASE::connect();
+        try{
+            $order = "ORDER BY id DESC";
+            if($sort == "gia_tang") $order = "ORDER BY giaban ASC";
+            elseif($sort == "gia_giam") $order = "ORDER BY giaban DESC";
+
+            $sql = "SELECT * FROM mathang 
+                    WHERE dongmay LIKE :dongmay 
+                       OR tenmathang LIKE :dongmay 
+                    $order";
+            $cmd = $dbcon->prepare($sql);
+            $cmd->bindValue(":dongmay", "%" . $dongmay . "%");
+            $cmd->execute();
+            return $cmd->fetchAll();
+        }
+        catch(PDOException $e){
+            $error_message = $e->getMessage();
+            echo "<p>Lỗi truy vấn: $error_message</p>";
+            exit();
+        }
+    }
+
+    // Lấy mặt hàng theo danh mục và sắp xếp giá
+    public function laymathangtheodanhmucvasapxep($danhmuc_id, $sort = null){
+        $dbcon = DATABASE::connect();
+        try{
+            $order = "ORDER BY id DESC";
+            if($sort == "gia_tang") $order = "ORDER BY giaban ASC";
+            elseif($sort == "gia_giam") $order = "ORDER BY giaban DESC";
+
+            $sql = "SELECT * FROM mathang WHERE danhmuc_id=:madm $order";
+            $cmd = $dbcon->prepare($sql);
+            $cmd->bindValue(":madm", $danhmuc_id);
+            $cmd->execute();
+            return $cmd->fetchAll();
+        }
+        catch(PDOException $e){
+            $error_message = $e->getMessage();
+            echo "<p>Lỗi truy vấn: $error_message</p>";
+            exit();
+        }
+    }
+
 }
 ?>
