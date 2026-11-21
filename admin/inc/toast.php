@@ -21,12 +21,7 @@ if (empty($flashMessages)) {
         // Cấu hình màu sắc & icon theo loại thông báo
         switch ($type) {
             case 'success':
-                $bgClass = 'bg-white border-l-4 border-red-500 shadow-lg';
-                $textClass = 'text-slate-800';
-                $iconClass = 'text-red-500';
-                $iconSvg = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
-                $barClass = 'bg-red-500';
-                $badgeTitle = 'Thành công';
+                $bgClass = 'bg-white border-l-4 border-emerald-500 shadow-none';
                 $textClass = 'text-slate-800';
                 $iconClass = 'text-emerald-500';
                 $iconSvg = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
@@ -35,7 +30,7 @@ if (empty($flashMessages)) {
                 break;
             case 'danger':
             case 'error':
-                $bgClass = 'bg-white border-l-4 border-rose-500 shadow-lg';
+                $bgClass = 'bg-white border-l-4 border-rose-500 shadow-none';
                 $textClass = 'text-slate-800';
                 $iconClass = 'text-rose-500';
                 $iconSvg = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
@@ -43,7 +38,7 @@ if (empty($flashMessages)) {
                 $badgeTitle = 'Lỗi xử lý';
                 break;
             case 'warning':
-                $bgClass = 'bg-white border-l-4 border-amber-500 shadow-lg';
+                $bgClass = 'bg-white border-l-4 border-amber-500 shadow-none';
                 $textClass = 'text-slate-800';
                 $iconClass = 'text-amber-500';
                 $iconSvg = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>';
@@ -51,7 +46,7 @@ if (empty($flashMessages)) {
                 $badgeTitle = 'Cảnh báo';
                 break;
             default:
-                $bgClass = 'bg-white border-l-4 border-blue-500 shadow-lg';
+                $bgClass = 'bg-white border-l-4 border-blue-500 shadow-none';
                 $textClass = 'text-slate-800';
                 $iconClass = 'text-blue-500';
                 $iconSvg = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
@@ -60,7 +55,7 @@ if (empty($flashMessages)) {
                 break;
         }
     ?>
-    <div class="toast-item pointer-events-auto rounded-xl p-4 <?= $bgClass ?> relative overflow-hidden border border-slate-100 flex items-start space-x-3">
+    <div class="toast-item pointer-events-auto rounded-md p-4 <?= $bgClass ?> relative overflow-hidden border border-slate-100 flex items-start space-x-3">
         <div class="flex-shrink-0 mt-0.5 <?= $iconClass ?>">
             <?= $iconSvg ?>
         </div>

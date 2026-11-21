@@ -82,7 +82,7 @@ require_once __DIR__ . '/inc/layout_header.php';
             </p>
         </div>
         <div class="flex items-center gap-2">
-            <button type="button" onclick="openCreateModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white text-xs font-bold rounded-xl transition shadow-sm shadow-red-600/25">
+            <button type="button" onclick="openCreateModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white text-xs font-bold rounded-md transition shadow-none shadow-none/25">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 <span>Thêm danh mục mới</span>
             </button>
@@ -91,39 +91,39 @@ require_once __DIR__ . '/inc/layout_header.php';
 
     <!-- 3 THẺ TỔNG HỢP DANH MỤC -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex items-center justify-between">
+        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-none flex items-center justify-between">
             <div>
                 <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tổng số phân loại</span>
                 <div class="text-xl font-black text-slate-900 mt-1 font-mono-num"><?= $totalCategories ?> danh mục</div>
             </div>
-            <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center">
+            <div class="w-10 h-10 rounded-md bg-slate-100 text-slate-600 flex items-center justify-center">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex items-center justify-between">
+        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-none flex items-center justify-between">
             <div>
                 <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tổng mặt hàng</span>
                 <div class="text-xl font-black text-red-600 mt-1 font-mono-num"><?= number_format($totalProductsAll) ?> linh kiện</div>
             </div>
-            <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
+            <div class="w-10 h-10 rounded-md bg-red-50 text-red-600 flex items-center justify-center">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex items-center justify-between">
+        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-none flex items-center justify-between">
             <div>
                 <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tổng số tồn kho</span>
                 <div class="text-xl font-black text-blue-600 mt-1 font-mono-num"><?= number_format($totalStockAll) ?> cái</div>
             </div>
-            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+            <div class="w-10 h-10 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
             </div>
         </div>
     </div>
 
     <!-- BẢNG DANH MỤC LINH KIỆN -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-none overflow-hidden flex flex-col">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
                 <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
@@ -156,7 +156,7 @@ require_once __DIR__ . '/inc/layout_header.php';
                                     </div>
                                 </td>
                                 <td class="py-3.5 px-5 text-center">
-                                    <a href="products.php?danhmuc_id=<?= (int)$cat['id'] ?>" class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold <?= $hasProducts ? 'bg-red-50 text-red-700 hover:bg-red-100' : 'bg-slate-100 text-slate-500' ?> transition">
+                                    <a href="products.php?danhmuc_id=<?= (int)$cat['id'] ?>" class="inline-flex items-center gap-1 px-3 py-1 rounded-md text-xs font-bold <?= $hasProducts ? 'bg-red-50 text-red-700 hover:bg-red-100' : 'bg-slate-100 text-slate-500' ?> transition">
                                         <span><?= (int)$cat['tong_san_pham'] ?> sản phẩm</span>
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                                     </a>
@@ -188,10 +188,10 @@ require_once __DIR__ . '/inc/layout_header.php';
      MODAL THÊM / SỬA DANH MỤC
      ========================================== -->
 <div id="category-modal" class="modal-overlay modal-hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="modal-container bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col">
+    <div class="modal-container bg-white w-full max-w-md rounded-3xl shadow-none border border-slate-100 overflow-hidden flex flex-col">
         <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
             <h3 id="category-modal-title" class="text-base font-extrabold text-slate-900">Thêm danh mục linh kiện</h3>
-            <button type="button" onclick="closeModal('category-modal')" class="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-200 transition">
+            <button type="button" onclick="closeModal('category-modal')" class="p-2 text-slate-400 hover:text-slate-600 rounded-md hover:bg-slate-200 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
@@ -201,14 +201,14 @@ require_once __DIR__ . '/inc/layout_header.php';
 
             <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">Tên danh mục linh kiện <span class="text-rose-500">*</span></label>
-                <input type="text" name="tendanhmuc" id="input-tendanhmuc" required placeholder="Ví dụ: Cánh quạt & Động cơ Brushless" class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                <input type="text" name="tendanhmuc" id="input-tendanhmuc" required placeholder="Ví dụ: Cánh quạt & Động cơ Brushless" class="w-full text-xs px-3.5 py-2.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
             </div>
 
             <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
-                <button type="button" onclick="closeModal('category-modal')" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">
+                <button type="button" onclick="closeModal('category-modal')" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-md transition">
                     Hủy bỏ
                 </button>
-                <button type="submit" id="category-modal-submit-btn" class="px-5 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold text-xs rounded-xl transition shadow-md shadow-red-600/25">
+                <button type="submit" id="category-modal-submit-btn" class="px-5 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold text-xs rounded-md transition shadow-none shadow-none/25">
                     Lưu danh mục
                 </button>
             </div>
@@ -220,8 +220,8 @@ require_once __DIR__ . '/inc/layout_header.php';
      MODAL XÁC NHẬN XÓA DANH MỤC
      ========================================== -->
 <div id="delete-category-modal" class="modal-overlay modal-hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="modal-container bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-100 p-6 text-center">
-        <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4">
+    <div class="modal-container bg-white w-full max-w-md rounded-3xl shadow-none border border-slate-100 p-6 text-center">
+        <div class="w-12 h-12 rounded-md bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
         </div>
         <h3 class="text-base font-extrabold text-slate-900 mb-1">Xác nhận xóa danh mục?</h3>
@@ -229,10 +229,10 @@ require_once __DIR__ . '/inc/layout_header.php';
         <form id="delete-cat-form" action="categories.php" method="POST" class="flex items-center justify-center gap-2">
             <input type="hidden" name="action" value="delete_category">
             <input type="hidden" name="category_id" id="delete-cat-id" value="">
-            <button type="button" onclick="closeModal('delete-category-modal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">
+            <button type="button" onclick="closeModal('delete-category-modal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-md transition">
                 Hủy bỏ
             </button>
-            <button type="submit" id="btn-confirm-delete-cat" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl transition shadow-md shadow-rose-600/30">
+            <button type="submit" id="btn-confirm-delete-cat" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-md transition shadow-none shadow-none/30">
                 Xác nhận xóa
             </button>
         </form>

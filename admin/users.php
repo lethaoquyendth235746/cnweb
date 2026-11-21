@@ -119,7 +119,7 @@ require_once __DIR__ . '/inc/layout_header.php';
             </p>
         </div>
         <div class="flex items-center gap-2">
-            <button type="button" onclick="openCreateUserModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white text-xs font-bold rounded-xl transition shadow-sm shadow-red-600/25">
+            <button type="button" onclick="openCreateUserModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white text-xs font-bold rounded-md transition shadow-none shadow-none/25">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
                 <span>Thêm nhân sự mới</span>
             </button>
@@ -127,16 +127,16 @@ require_once __DIR__ . '/inc/layout_header.php';
     </div>
 
     <!-- THANH TÌM KIẾM & BỘ LỌC -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-none">
         <form action="users.php" method="GET" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
                 <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Tìm kiếm nhân viên</label>
-                <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Tên, email hoặc số điện thoại..." class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Tên, email hoặc số điện thoại..." class="w-full px-3 py-2 text-xs rounded-md bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
             </div>
 
             <div>
                 <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Vai trò quyền hạn</label>
-                <select name="loai" class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                <select name="loai" class="w-full px-3 py-2 text-xs rounded-md bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
                     <option value="">-- Tất cả vai trò --</option>
                     <option value="1" <?= ($roleFilter === 1) ? 'selected' : '' ?>>Quản trị viên (SuperAdmin)</option>
                     <option value="2" <?= ($roleFilter === 2) ? 'selected' : '' ?>>Kỹ thuật viên / Nhân viên</option>
@@ -144,10 +144,10 @@ require_once __DIR__ . '/inc/layout_header.php';
             </div>
 
             <div class="flex items-end gap-2">
-                <button type="submit" class="flex-1 py-2 px-4 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition shadow-sm">
+                <button type="submit" class="flex-1 py-2 px-4 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-md transition shadow-none">
                     Lọc nhân sự
                 </button>
-                <a href="users.php" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition" title="Xóa bộ lọc">
+                <a href="users.php" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-md transition" title="Xóa bộ lọc">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                 </a>
             </div>
@@ -155,7 +155,7 @@ require_once __DIR__ . '/inc/layout_header.php';
     </div>
 
     <!-- BẢNG DANH SÁCH NHÂN SỰ -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-none overflow-hidden flex flex-col">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
                 <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
@@ -183,12 +183,12 @@ require_once __DIR__ . '/inc/layout_header.php';
                             <tr class="table-hover-row transition-colors">
                                 <td class="py-3.5 px-4">
                                     <div class="flex items-center gap-3">
-                                        <img src="<?= htmlspecialchars($avatarUrl) ?>" alt="Avatar" class="w-10 h-10 rounded-full object-cover border border-slate-200" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=<?= urlencode($u['hoten']) ?>&background=dc2626&color=fff';">
+                                        <img src="<?= htmlspecialchars($avatarUrl) ?>" alt="Avatar" class="w-10 h-10 rounded-md object-cover border border-slate-200" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=<?= urlencode($u['hoten']) ?>&background=dc2626&color=fff';">
                                         <div>
                                             <div class="font-bold text-slate-900 text-sm flex items-center gap-2">
                                                 <span><?= htmlspecialchars($u['hoten']) ?></span>
                                                 <?php if ($isSelf): ?>
-                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-100 text-orange-800">Bạn</span>
+                                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-orange-100 text-orange-800">Bạn</span>
                                                 <?php endif; ?>
                                             </div>
                                             <div class="text-[11px] text-slate-400 font-mono">ID: #<?= (int)$u['id'] ?></div>
@@ -200,12 +200,12 @@ require_once __DIR__ . '/inc/layout_header.php';
                                     <div class="text-slate-500 font-mono-num text-[11px] mt-0.5"><?= htmlspecialchars($u['sodienthoai'] ?: 'Chưa có SĐT') ?></div>
                                 </td>
                                 <td class="py-3.5 px-4 text-center whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold <?= $u['role_badge_class'] ?>">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold <?= $u['role_badge_class'] ?>">
                                         <?= htmlspecialchars($u['role_label']) ?>
                                     </span>
                                 </td>
                                 <td class="py-3.5 px-4 text-center whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold <?= $u['status_badge_class'] ?>">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold <?= $u['status_badge_class'] ?>">
                                         <?= htmlspecialchars($u['status_label']) ?>
                                     </span>
                                 </td>
@@ -243,10 +243,10 @@ require_once __DIR__ . '/inc/layout_header.php';
      MODAL THÊM / SỬA NHÂN SỰ
      ========================================== -->
 <div id="user-modal" class="modal-overlay modal-hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="modal-container bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col">
+    <div class="modal-container bg-white w-full max-w-lg rounded-3xl border border-slate-100 overflow-hidden flex flex-col">
         <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
             <h3 id="user-modal-title" class="text-base font-extrabold text-slate-900">Thêm nhân sự mới</h3>
-            <button type="button" onclick="closeModal('user-modal')" class="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-200 transition">
+            <button type="button" onclick="closeModal('user-modal')" class="p-2 text-slate-400 hover:text-slate-600 rounded-md hover:bg-slate-200 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
@@ -257,39 +257,39 @@ require_once __DIR__ . '/inc/layout_header.php';
 
             <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">Họ và tên nhân sự <span class="text-rose-500">*</span></label>
-                <input type="text" name="hoten" id="input-u-hoten" required placeholder="Nguyễn Văn A" class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                <input type="text" name="hoten" id="input-u-hoten" required placeholder="Nguyễn Văn A" class="w-full text-xs px-3.5 py-2.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div id="wrapper-email">
                     <label class="block text-xs font-bold text-slate-700 mb-1">Email đăng nhập <span class="text-rose-500">*</span></label>
-                    <input type="email" name="email" id="input-u-email" required placeholder="kythuat@xag.vn" class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                    <input type="email" name="email" id="input-u-email" required placeholder="kythuat@xag.vn" class="w-full text-xs px-3.5 py-2.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">Số điện thoại <span class="text-rose-500">*</span></label>
-                    <input type="text" name="sodienthoai" id="input-u-sdt" required placeholder="0987xxxxxx" class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                    <input type="text" name="sodienthoai" id="input-u-sdt" required placeholder="0987xxxxxx" class="w-full text-xs px-3.5 py-2.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
                 </div>
             </div>
 
             <div id="wrapper-password">
                 <label class="block text-xs font-bold text-slate-700 mb-1">Mật khẩu ban đầu <span class="text-rose-500">*</span></label>
-                <input type="password" name="matkhau" id="input-u-pass" placeholder="Tối thiểu 6 ký tự" class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                <input type="password" name="matkhau" id="input-u-pass" placeholder="Tối thiểu 6 ký tự" class="w-full text-xs px-3.5 py-2.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
             </div>
 
             <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">Vai trò quyền hạn <span class="text-rose-500">*</span></label>
-                <select name="loai" id="input-u-loai" required class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                <select name="loai" id="input-u-loai" required class="w-full text-xs px-3.5 py-2.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
                     <option value="2">Kỹ thuật viên / Nhân viên (Xử lý đơn, quản lý kho)</option>
                     <option value="1">Quản trị viên (SuperAdmin - Toàn quyền hệ thống)</option>
                 </select>
             </div>
 
             <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
-                <button type="button" onclick="closeModal('user-modal')" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">
+                <button type="button" onclick="closeModal('user-modal')" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-md transition">
                     Hủy bỏ
                 </button>
-                <button type="submit" id="user-modal-submit-btn" class="px-5 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold text-xs rounded-xl transition shadow-md shadow-red-600/25">
+                <button type="submit" id="user-modal-submit-btn" class="px-5 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold text-xs rounded-md transition shadow-none shadow-none/25">
                     Lưu nhân sự
                 </button>
             </div>
@@ -301,7 +301,7 @@ require_once __DIR__ . '/inc/layout_header.php';
      MODAL ĐẶT LẠI MẬT KHẨU
      ========================================== -->
 <div id="reset-password-modal" class="modal-overlay modal-hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="modal-container bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-100 p-6">
+    <div class="modal-container bg-white w-full max-w-md rounded-3xl border border-slate-100 p-6">
         <h3 class="text-base font-extrabold text-slate-900 mb-1">Đặt lại mật khẩu nhân viên</h3>
         <p class="text-xs text-slate-500 mb-4">
             Đang đặt mật khẩu mới cho nhân sự <strong id="reset-user-name" class="text-slate-800"></strong>.
@@ -311,13 +311,13 @@ require_once __DIR__ . '/inc/layout_header.php';
             <input type="hidden" name="user_id" id="reset-user-id" value="">
             <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">Mật khẩu mới (Tối thiểu 6 ký tự)</label>
-                <input type="password" name="new_password" required minlength="6" placeholder="Nhập mật khẩu mới..." class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                <input type="password" name="new_password" required minlength="6" placeholder="Nhập mật khẩu mới..." class="w-full text-xs px-3.5 py-2.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
             </div>
             <div class="flex items-center justify-end gap-2 pt-2">
-                <button type="button" onclick="closeModal('reset-password-modal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">
+                <button type="button" onclick="closeModal('reset-password-modal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-md transition">
                     Hủy bỏ
                 </button>
-                <button type="submit" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl transition shadow-md shadow-amber-600/30">
+                <button type="submit" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-md transition shadow-none shadow-none/30">
                     Cập nhật mật khẩu
                 </button>
             </div>

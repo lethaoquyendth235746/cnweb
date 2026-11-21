@@ -30,7 +30,7 @@ class DatabaseService {
 
         try {
             $this->pdo = new PDO($dsn, $this->username, $this->password, $options);
-            // Auto‑migration: ensure required columns and tables exist (run once per request)
+            // Auto migration: đảm bảo các cột và bảng cần thiết tồn tại (chạy 1 lần mỗi request)
             static $migrationRun = false;
             if (!$migrationRun) {
                 $migrationRun = true;
@@ -38,11 +38,11 @@ class DatabaseService {
                     $sqlFile = realpath(__DIR__ . '/../../data/update_admin_features.sql');
                     if ($sqlFile && file_exists($sqlFile)) {
                         $sql = file_get_contents($sqlFile);
-                        // Execute the whole script; MySQL allows multiple statements
+                        // Thực thi toàn bộ script; MySQL cho phép multiple statements
                         $this->pdo->exec($sql);
                     }
                 } catch (Exception $e) {
-                    error_log('Auto‑migration failed: ' . $e->getMessage());
+                    error_log('Auto migration failed: ' . $e->getMessage());
                 }
             }
         } catch (PDOException $e) {
@@ -127,7 +127,7 @@ class DatabaseService {
     }
 
     /**
-     * Lấy ID vừa được chèn tự tăng gần nhất
+     * Lấy ID vừa được chèn tự động gần nhất
      */
     public static function lastInsertId(?string $name = null): string|false {
         return self::pdo()->lastInsertId($name);

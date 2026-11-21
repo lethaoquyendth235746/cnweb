@@ -86,17 +86,17 @@ class InventoryAdminService {
                        d.id AS danhmuc_id, d.tendanhmuc,
                        -- Tổng số lượng đã nhập từ phiếu nhập thành công (trangthai = 1)
                        COALESCE((
-                           SELECT SUM(ctpn.soluong) 
-                           FROM ct_phieunhap ctpn 
-                           JOIN phieunhap pn ON ctpn.phieunhap_id = pn.id 
-                           WHERE ctpn.mathang_id = m.id AND pn.trangthai = 1
+                            SELECT SUM(ctpn.soluong) 
+                            FROM ct_phieunhap ctpn 
+                            JOIN phieunhap pn ON ctpn.phieunhap_id = pn.id 
+                            WHERE ctpn.mathang_id = m.id AND pn.trangthai = 1
                        ), 0) AS tong_da_nhap,
                        -- Tổng số lượng đã bán từ các đơn hàng hợp lệ (không tính đơn hủy 4 hoặc hoàn 5)
                        COALESCE((
-                           SELECT SUM(dhct.soluong) 
-                           FROM donhangct dhct 
-                           JOIN donhang dh ON dhct.donhang_id = dh.id 
-                           WHERE dhct.mathang_id = m.id AND dh.trangthai NOT IN (4, 5)
+                            SELECT SUM(dhct.soluong) 
+                            FROM donhangct dhct 
+                            JOIN donhang dh ON dhct.donhang_id = dh.id 
+                            WHERE dhct.mathang_id = m.id AND dh.trangthai NOT IN (4, 5)
                        ), 0) AS tong_da_ban,
                        -- Tổng giá trị tồn kho theo giá vốn (giagoc * soluongton)
                        (m.giagoc * m.soluongton) AS gia_tri_ton_kho
@@ -352,7 +352,10 @@ class InventoryAdminService {
      * @return array ['success' => bool, 'receipt_id' => int, 'maphieunhap' => string]
      * @throws InvalidArgumentException|Exception
      */
-    public function createImportReceipt(array $headerData, array $items, int $userId): array {
+    public function createImportReceipt(array $headerData, array $items, ?int $userId = null): array {
+        if ($userId === null) {
+            $userId = (int)($headerData['nguoidung_id'] ?? 0);
+        }
         if (empty($headerData['nhacungcap'])) {
             throw new InvalidArgumentException("Tên nhà cung cấp / đơn vị phân phối không được để trống.");
         }

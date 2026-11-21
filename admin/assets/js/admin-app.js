@@ -1,10 +1,10 @@
 /**
  * admin/assets/js/admin-app.js
- * XAG Store - Trình điều khiển tương tác Giao diện Quản trị
+ * XAG Store - Trình �'iều khi�fn tương tác Giao di�?n Quản tr�<
  */
 
 document.addEventListener('DOMContentLoaded', function () {
-    // 1. Khởi tạo Lucide Icons nếu có thư viện
+    // 1. Kh�Yi tạo Lucide Icons nếu có thư vi�?n
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
     }
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
         sidebarBackdrop.addEventListener('click', closeSidebar);
     }
 
-    // 3. User Dropdown Toggle ở Topbar
+    // 3. User Dropdown Toggle �Y Topbar
     const userMenuBtn = document.getElementById('user-menu-btn');
     const userMenuDropdown = document.getElementById('user-menu-dropdown');
 
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // 4. Quản lý Toast tự động biến mất sau 3.5s
+    // 4. Quản lý Toast tự �'�Tng biến mất sau 3.5s
     const toasts = document.querySelectorAll('.toast-item');
     toasts.forEach(function (toast) {
         const timeoutId = setTimeout(function () {
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 400);
     }
 
-    // 5. Image Preview tự động khi chọn file
+    // 5. Image Preview tự �'�Tng khi chọn file
     const fileInputs = document.querySelectorAll('input[type="file"][data-preview-target]');
     fileInputs.forEach(function (input) {
         input.addEventListener('change', function () {
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /**
- * Mở modal chung theo ID
+ * M�Y modal chung theo ID
  */
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
@@ -130,7 +130,7 @@ function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
         modal.classList.add('modal-hidden');
-        // Kiểm tra xem còn modal nào đang mở không trước khi gỡ overflow-hidden
+        // Ki�fm tra xem còn modal nào �'ang m�Y không trư�>c khi gỡ overflow-hidden
         const remaining = document.querySelectorAll('.modal-overlay:not(.modal-hidden)');
         if (remaining.length === 0) {
             document.body.classList.remove('overflow-hidden');
@@ -139,15 +139,15 @@ function closeModal(modalId) {
 }
 
 /**
- * Tiện ích định dạng số sang VNĐ (Client-side)
+ * Ti�?n ích �'�<nh dạng s�' sang VNĐ (Client-side)
  */
 function formatVNDJs(amount) {
     const num = Math.round(Number(amount) || 0);
-    return num.toLocaleString('vi-VN') + ' ₫';
+    return num.toLocaleString('vi-VN') + ' �,�';
 }
 
 /**
- * Tính toán tự động thành tiền trên các dòng Phiếu nhập kho (Inventory)
+ * Tính toán tự �'�Tng thành tiền trên các dòng Phiếu nhập kho (Inventory)
  */
 function recalculateReceiptTotal() {
     const rows = document.querySelectorAll('#receipt-items-table tbody tr.receipt-row');
@@ -173,3 +173,4 @@ function recalculateReceiptTotal() {
         grandTotalDisplay.textContent = formatVNDJs(grandTotal);
     }
 }
+

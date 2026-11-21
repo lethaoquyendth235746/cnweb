@@ -117,74 +117,74 @@ require_once __DIR__ . '/inc/layout_header.php';
             </p>
         </div>
         <div class="flex items-center gap-2">
-            <span class="text-xs font-semibold px-3 py-1.5 bg-slate-100 text-slate-600 rounded-xl">
+            <span class="text-xs font-semibold px-3 py-1.5 bg-slate-100 text-slate-600 rounded-md">
                 Tổng cộng: <strong class="text-slate-900 font-mono-num"><?= number_format($totalOrders) ?></strong> đơn
             </span>
         </div>
     </div>
 
     <!-- HỆ THỐNG TABS LỌC TRẠNG THÁI -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-2 shadow-sm overflow-x-auto">
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-2 shadow-none overflow-x-auto">
         <div class="flex items-center gap-1.5 min-w-max">
             <!-- Tab: Tất cả -->
             <a href="orders.php<?= (!empty($search) ? '?search=' . urlencode($search) : '') ?>" 
-               class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all <?= ($selectedStatus === null) ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' ?>">
+               class="flex items-center gap-2 px-3.5 py-2 rounded-md text-xs font-bold transition-all <?= ($selectedStatus === null) ? 'bg-slate-900 text-white shadow-none' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' ?>">
                 <span>Tất cả</span>
-                <span class="px-2 py-0.5 rounded-full text-[10px] <?= ($selectedStatus === null) ? 'bg-slate-700 text-white' : 'bg-slate-200 text-slate-700' ?>">
+                <span class="px-2 py-0.5 rounded-md text-[10px] <?= ($selectedStatus === null) ? 'bg-slate-700 text-white' : 'bg-slate-200 text-slate-700' ?>">
                     <?= $statusCounts['all'] ?? 0 ?>
                 </span>
             </a>
 
             <!-- Tab 0: Chờ xác nhận -->
             <a href="orders.php?trangthai=0<?= (!empty($search) ? '&search=' . urlencode($search) : '') ?>" 
-               class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all <?= ($selectedStatus === 0) ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-600 hover:bg-amber-50 hover:text-amber-800' ?>">
+               class="flex items-center gap-2 px-3.5 py-2 rounded-md text-xs font-bold transition-all <?= ($selectedStatus === 0) ? 'bg-amber-500 text-white shadow-none' : 'text-slate-600 hover:bg-amber-50 hover:text-amber-800' ?>">
                 <span>Chờ xác nhận</span>
-                <span class="px-2 py-0.5 rounded-full text-[10px] <?= ($selectedStatus === 0) ? 'bg-amber-600 text-white' : 'bg-amber-100 text-amber-800' ?>">
+                <span class="px-2 py-0.5 rounded-md text-[10px] <?= ($selectedStatus === 0) ? 'bg-amber-600 text-white' : 'bg-amber-100 text-amber-800' ?>">
                     <?= $statusCounts[0] ?? 0 ?>
                 </span>
             </a>
 
             <!-- Tab 1: Đã xác nhận -->
             <a href="orders.php?trangthai=1<?= (!empty($search) ? '&search=' . urlencode($search) : '') ?>" 
-               class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all <?= ($selectedStatus === 1) ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-800' ?>">
+               class="flex items-center gap-2 px-3.5 py-2 rounded-md text-xs font-bold transition-all <?= ($selectedStatus === 1) ? 'bg-blue-600 text-white shadow-none' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-800' ?>">
                 <span>Đã xác nhận & Đóng gói</span>
-                <span class="px-2 py-0.5 rounded-full text-[10px] <?= ($selectedStatus === 1) ? 'bg-blue-700 text-white' : 'bg-blue-100 text-blue-800' ?>">
+                <span class="px-2 py-0.5 rounded-md text-[10px] <?= ($selectedStatus === 1) ? 'bg-blue-700 text-white' : 'bg-blue-100 text-blue-800' ?>">
                     <?= $statusCounts[1] ?? 0 ?>
                 </span>
             </a>
 
             <!-- Tab 2: Đang giao -->
             <a href="orders.php?trangthai=2<?= (!empty($search) ? '&search=' . urlencode($search) : '') ?>" 
-               class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all <?= ($selectedStatus === 2) ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-800' ?>">
+               class="flex items-center gap-2 px-3.5 py-2 rounded-md text-xs font-bold transition-all <?= ($selectedStatus === 2) ? 'bg-indigo-600 text-white shadow-none' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-800' ?>">
                 <span>Đang vận chuyển</span>
-                <span class="px-2 py-0.5 rounded-full text-[10px] <?= ($selectedStatus === 2) ? 'bg-indigo-700 text-white' : 'bg-indigo-100 text-indigo-800' ?>">
+                <span class="px-2 py-0.5 rounded-md text-[10px] <?= ($selectedStatus === 2) ? 'bg-indigo-700 text-white' : 'bg-indigo-100 text-indigo-800' ?>">
                     <?= $statusCounts[2] ?? 0 ?>
                 </span>
             </a>
 
             <!-- Tab 3: Hoàn thành -->
             <a href="orders.php?trangthai=3<?= (!empty($search) ? '&search=' . urlencode($search) : '') ?>" 
-               class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all <?= ($selectedStatus === 3) ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-800' ?>">
+               class="flex items-center gap-2 px-3.5 py-2 rounded-md text-xs font-bold transition-all <?= ($selectedStatus === 3) ? 'bg-emerald-600 text-white shadow-none' : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-800' ?>">
                 <span>Hoàn thành</span>
-                <span class="px-2 py-0.5 rounded-full text-[10px] <?= ($selectedStatus === 3) ? 'bg-emerald-700 text-white' : 'bg-emerald-100 text-emerald-800' ?>">
+                <span class="px-2 py-0.5 rounded-md text-[10px] <?= ($selectedStatus === 3) ? 'bg-emerald-700 text-white' : 'bg-emerald-100 text-emerald-800' ?>">
                     <?= $statusCounts[3] ?? 0 ?>
                 </span>
             </a>
 
             <!-- Tab 4: Đã hủy -->
             <a href="orders.php?trangthai=4<?= (!empty($search) ? '&search=' . urlencode($search) : '') ?>" 
-               class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all <?= ($selectedStatus === 4) ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-600 hover:bg-rose-50 hover:text-rose-800' ?>">
+               class="flex items-center gap-2 px-3.5 py-2 rounded-md text-xs font-bold transition-all <?= ($selectedStatus === 4) ? 'bg-rose-600 text-white shadow-none' : 'text-slate-600 hover:bg-rose-50 hover:text-rose-800' ?>">
                 <span>Đã hủy</span>
-                <span class="px-2 py-0.5 rounded-full text-[10px] <?= ($selectedStatus === 4) ? 'bg-rose-700 text-white' : 'bg-rose-100 text-rose-800' ?>">
+                <span class="px-2 py-0.5 rounded-md text-[10px] <?= ($selectedStatus === 4) ? 'bg-rose-700 text-white' : 'bg-rose-100 text-rose-800' ?>">
                     <?= $statusCounts[4] ?? 0 ?>
                 </span>
             </a>
 
             <!-- Tab 5: Trả hàng / Hoàn tiền -->
             <a href="orders.php?trangthai=5<?= (!empty($search) ? '&search=' . urlencode($search) : '') ?>" 
-               class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all <?= ($selectedStatus === 5) ? 'bg-purple-600 text-white shadow-sm' : 'text-slate-600 hover:bg-purple-50 hover:text-purple-800' ?>">
+               class="flex items-center gap-2 px-3.5 py-2 rounded-md text-xs font-bold transition-all <?= ($selectedStatus === 5) ? 'bg-purple-600 text-white shadow-none' : 'text-slate-600 hover:bg-purple-50 hover:text-purple-800' ?>">
                 <span>Trả hàng / Hoàn tiền</span>
-                <span class="px-2 py-0.5 rounded-full text-[10px] <?= ($selectedStatus === 5) ? 'bg-purple-700 text-white' : 'bg-purple-100 text-purple-800' ?>">
+                <span class="px-2 py-0.5 rounded-md text-[10px] <?= ($selectedStatus === 5) ? 'bg-purple-700 text-white' : 'bg-purple-100 text-purple-800' ?>">
                     <?= $statusCounts[5] ?? 0 ?>
                 </span>
             </a>
@@ -192,7 +192,7 @@ require_once __DIR__ . '/inc/layout_header.php';
     </div>
 
     <!-- THANH TÌM KIẾM & BỘ LỌC NGÀY -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-none">
         <form action="orders.php" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <?php if ($selectedStatus !== null): ?>
                 <input type="hidden" name="trangthai" value="<?= $selectedStatus ?>">
@@ -201,7 +201,7 @@ require_once __DIR__ . '/inc/layout_header.php';
             <div>
                 <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Từ khóa tìm kiếm</label>
                 <div class="relative">
-                    <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Mã đơn (#), Tên khách, SĐT..." class="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
+                    <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Mã đơn (#), Tên khách, SĐT..." class="w-full pl-9 pr-3 py-2 text-xs rounded-md bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
@@ -210,20 +210,20 @@ require_once __DIR__ . '/inc/layout_header.php';
 
             <div>
                 <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Từ ngày</label>
-                <input type="date" name="from_date" value="<?= htmlspecialchars($fromDate) ?>" class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
+                <input type="date" name="from_date" value="<?= htmlspecialchars($fromDate) ?>" class="w-full px-3 py-2 text-xs rounded-md bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
             </div>
 
             <div>
                 <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Đến ngày</label>
-                <input type="date" name="to_date" value="<?= htmlspecialchars($toDate) ?>" class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
+                <input type="date" name="to_date" value="<?= htmlspecialchars($toDate) ?>" class="w-full px-3 py-2 text-xs rounded-md bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
             </div>
 
             <div class="flex items-end gap-2">
-                <button type="submit" class="flex-1 py-2 px-4 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition shadow-sm flex items-center justify-center gap-1.5">
+                <button type="submit" class="flex-1 py-2 px-4 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-md transition shadow-none flex items-center justify-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
                     <span>Lọc đơn</span>
                 </button>
-                <a href="orders.php" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition" title="Xóa bộ lọc">
+                <a href="orders.php" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-md transition" title="Xóa bộ lọc">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                 </a>
             </div>
@@ -231,7 +231,7 @@ require_once __DIR__ . '/inc/layout_header.php';
     </div>
 
     <!-- BẢNG DANH SÁCH ĐƠN HÀNG -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-none overflow-hidden flex flex-col">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
                 <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
@@ -285,13 +285,13 @@ require_once __DIR__ . '/inc/layout_header.php';
                                     <?= formatVND($od['tongtien']) ?>
                                 </td>
                                 <td class="py-3.5 px-4 text-center whitespace-nowrap">
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border <?= $stMeta['badge_class'] ?>">
-                                        <span class="w-1.5 h-1.5 rounded-full <?= $stMeta['dot_class'] ?>"></span>
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold border <?= $stMeta['badge_class'] ?>">
+                                        <span class="w-1.5 h-1.5 rounded-md <?= $stMeta['dot_class'] ?>"></span>
                                         <?= htmlspecialchars($stMeta['label']) ?>
                                     </span>
                                 </td>
                                 <td class="py-3.5 px-4 text-right whitespace-nowrap">
-                                    <button type="button" onclick="openOrderDetail(<?= (int)$od['id'] ?>)" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 rounded-xl font-bold transition shadow-sm">
+                                    <button type="button" onclick="openOrderDetail(<?= (int)$od['id'] ?>)" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 rounded-md font-bold transition shadow-none">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                         <span>Xử lý đơn</span>
                                     </button>
@@ -330,7 +330,7 @@ require_once __DIR__ . '/inc/layout_header.php';
      MODAL CHI TIẾT & CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG
      ========================================== -->
 <div id="order-detail-modal" class="modal-overlay modal-hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="modal-container bg-white w-full max-w-3xl rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
+    <div class="modal-container bg-white w-full max-w-3xl rounded-3xl shadow-none border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
         
         <!-- Header Modal -->
         <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -341,7 +341,7 @@ require_once __DIR__ . '/inc/layout_header.php';
                 </h3>
                 <p id="modal-order-date" class="text-xs text-slate-500 mt-0.5">Thời gian đặt: ---</p>
             </div>
-            <button type="button" onclick="closeModal('order-detail-modal')" class="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-200 transition">
+            <button type="button" onclick="closeModal('order-detail-modal')" class="p-2 text-slate-400 hover:text-slate-600 rounded-md hover:bg-slate-200 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
@@ -384,7 +384,7 @@ require_once __DIR__ . '/inc/layout_header.php';
                         <tfoot class="bg-slate-50 font-bold border-t border-slate-200">
                             <tr>
                                 <td colspan="4" class="py-3 px-3 text-right text-slate-700">Tổng thanh toán:</td>
-                                <td id="modal-order-grand-total" class="py-3 px-3 text-right text-base text-red-600 font-mono-num font-black">0 ₫</td>
+                                <td id="modal-order-grand-total" class="py-3 px-3 text-right text-base text-red-600 font-mono-num font-black">0 đ</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -406,14 +406,14 @@ require_once __DIR__ . '/inc/layout_header.php';
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
                     <div>
                         <label class="block text-[11px] font-bold text-slate-700 mb-1">Chuyển sang trạng thái tiếp theo</label>
-                        <select name="new_status" id="modal-select-status" class="w-full text-xs font-semibold px-3 py-2 rounded-xl bg-white border border-orange-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                        <select name="new_status" id="modal-select-status" class="w-full text-xs font-semibold px-3 py-2 rounded-md bg-white border border-orange-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
                             <!-- Các option hợp lệ sẽ được JS populate theo State Machine -->
                         </select>
                     </div>
 
                     <div>
                         <label class="block text-[11px] font-bold text-slate-700 mb-1">Ghi chú xử lý nội bộ của Admin</label>
-                        <input type="text" name="admin_note" id="modal-admin-note" placeholder="Mã vận đơn bưu cục / lý do hủy..." class="w-full text-xs px-3 py-2 rounded-xl bg-white border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                        <input type="text" name="admin_note" id="modal-admin-note" placeholder="Mã vận đơn bưu cục / lý do hủy..." class="w-full text-xs px-3 py-2 rounded-md bg-white border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
                     </div>
                 </div>
 
@@ -421,7 +421,7 @@ require_once __DIR__ . '/inc/layout_header.php';
                     <span id="modal-status-rule-tip" class="text-[11px] text-slate-500 italic">
                         * Khi chuyển sang Hủy hoặc Hoàn tiền, linh kiện sẽ tự động được hoàn về kho XAG.
                     </span>
-                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold text-xs rounded-xl transition shadow-md shadow-red-600/25">
+                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold text-xs rounded-md transition shadow-none shadow-none/25">
                         Cập nhật ngay
                     </button>
                 </div>
@@ -431,7 +431,7 @@ require_once __DIR__ . '/inc/layout_header.php';
 
         <!-- Footer Modal -->
         <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end">
-            <button type="button" onclick="closeModal('order-detail-modal')" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl transition">
+            <button type="button" onclick="closeModal('order-detail-modal')" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-md transition">
                 Đóng cửa sổ
             </button>
         </div>

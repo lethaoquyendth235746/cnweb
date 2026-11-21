@@ -1,7 +1,7 @@
 <?php
 /**
- * Chuyển hướng tương thích ngược từ qldanhmuc sang categories.php
- * Hệ thống Quản trị XAG Store - Giai đoạn 3
+ * Chuy�fn hư�>ng tương thích ngược từ qldanhmuc sang categories.php
+ * H�? th�'ng Quản tr�< XAG Store - Giai �'oạn 3
  */
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -10,3 +10,4 @@ if (session_status() === PHP_SESSION_NONE) {
 $queryString = !empty($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '';
 header("Location: ../categories.php{$queryString}", true, 302);
 exit;
+

@@ -29,7 +29,7 @@
 	<input class="form-control" type="number" name="txtgiaban" value="0">
 </div>
 <div class="mb-3 mt-3">
-	<label for="txtsoluong" class="form-label">Số lượng</label>
+	<label for="txtsoluong" class="form-label">S�' lượng</label>
 	<input class="form-control" type="number" name="txtsoluong" value="0">
 </div>
 <div class="mb-3 mt-3">

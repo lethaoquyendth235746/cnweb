@@ -5,7 +5,7 @@
  * Giai đoạn 3: Tailwind CSS + Chart.js + Service Layer
  */
 
-$pageTitle = 'Bảng điều khiển';
+$pageTitle = "Bảng điều khiển";
 require_once __DIR__ . '/inc/layout_header.php';
 require_once __DIR__ . '/services/DashboardService.php';
 require_once __DIR__ . '/services/OrderAdminService.php';
@@ -32,7 +32,7 @@ $topProducts = $dashService->getTopSellingProducts(5);
         <div>
             <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
                 <span>Tổng quan Vận hành XAG Store</span>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-emerald-100 text-emerald-800">
                     Trực tiếp
                 </span>
             </h1>
@@ -41,11 +41,11 @@ $topProducts = $dashService->getTopSellingProducts(5);
             </p>
         </div>
         <div class="flex items-center gap-2">
-            <a href="inventory.php" class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 hover:border-slate-400 transition shadow-sm">
+            <a href="inventory.php" class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 hover:border-slate-400 transition shadow-none">
                 <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 <span>Nhập kho mới</span>
             </a>
-            <a href="orders.php" class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-white bg-gradient-to-r from-red-600 to-orange-600 rounded-xl hover:from-red-700 hover:to-orange-700 transition shadow-sm shadow-red-600/25">
+            <a href="orders.php" class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-white bg-gradient-to-r from-red-600 to-orange-600 rounded-md hover:from-red-700 hover:to-orange-700 transition shadow-none shadow-none/25">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                 <span>Xử lý đơn (<?= $kpis['don_cho_xac_nhan'] ?>)</span>
             </a>
@@ -56,10 +56,10 @@ $topProducts = $dashService->getTopSellingProducts(5);
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         
         <!-- KPI 1: Doanh thu thực tế -->
-        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm relative overflow-hidden group hover:shadow-md transition">
+        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-none relative overflow-hidden group hover:shadow-none transition">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Doanh thu thực tế</span>
-                <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div class="w-10 h-10 rounded-md bg-red-50 text-red-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
             </div>
@@ -78,10 +78,10 @@ $topProducts = $dashService->getTopSellingProducts(5);
         </div>
 
         <!-- KPI 2: Tổng đơn hàng & Chờ xác nhận -->
-        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm relative overflow-hidden group hover:shadow-md transition">
+        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-none relative overflow-hidden group hover:shadow-none transition">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Đơn hàng Drone</span>
-                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div class="w-10 h-10 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
                 </div>
             </div>
@@ -91,8 +91,8 @@ $topProducts = $dashService->getTopSellingProducts(5);
                     <span class="text-xs font-medium text-slate-500">đơn toàn bộ</span>
                 </div>
                 <div class="mt-2 flex items-center gap-1.5 text-xs">
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-bold <?= ($kpis['don_cho_xac_nhan'] > 0) ? 'bg-amber-100 text-amber-800 animate-pulse' : 'bg-slate-100 text-slate-600' ?>">
-                        <span class="w-1.5 h-1.5 rounded-full <?= ($kpis['don_cho_xac_nhan'] > 0) ? 'bg-amber-500' : 'bg-slate-400' ?>"></span>
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-bold <?= ($kpis['don_cho_xac_nhan'] > 0) ? 'bg-amber-100 text-amber-800 animate-pulse' : 'bg-slate-100 text-slate-600' ?>">
+                        <span class="w-1.5 h-1.5 rounded-md <?= ($kpis['don_cho_xac_nhan'] > 0) ? 'bg-amber-500' : 'bg-slate-400' ?>"></span>
                         <?= $kpis['don_cho_xac_nhan'] ?> chờ duyệt
                     </span>
                     <span class="text-slate-400">•</span>
@@ -103,10 +103,10 @@ $topProducts = $dashService->getTopSellingProducts(5);
         </div>
 
         <!-- KPI 3: Tổng linh kiện & Danh mục -->
-        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm relative overflow-hidden group hover:shadow-md transition">
+        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-none relative overflow-hidden group hover:shadow-none transition">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Linh kiện & Drone</span>
-                <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div class="w-10 h-10 rounded-md bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                 </div>
             </div>
@@ -125,10 +125,10 @@ $topProducts = $dashService->getTopSellingProducts(5);
         </div>
 
         <!-- KPI 4: Cảnh báo tồn kho thấp & Hết hàng -->
-        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm relative overflow-hidden group hover:shadow-md transition">
+        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-none relative overflow-hidden group hover:shadow-none transition">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Cảnh báo Tồn kho</span>
-                <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div class="w-10 h-10 rounded-md bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                 </div>
             </div>
@@ -152,7 +152,7 @@ $topProducts = $dashService->getTopSellingProducts(5);
     </div>
 
     <!-- BIỂU ĐỒ CHART.JS DOANH THU & ĐƠN HÀNG -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-sm">
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-none">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div>
                 <h3 class="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
@@ -161,8 +161,8 @@ $topProducts = $dashService->getTopSellingProducts(5);
                 </h3>
                 <p class="text-xs text-slate-500 mt-0.5">Biểu đồ đối soát doanh thu hoàn thành và số lượng đơn hàng theo chu kỳ</p>
             </div>
-            <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl self-start">
-                <button type="button" id="btn-chart-7d" onclick="switchChartView('7d')" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-white text-red-600 shadow-sm transition">
+            <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-md self-start">
+                <button type="button" id="btn-chart-7d" onclick="switchChartView('7d')" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-white text-red-600 shadow-none transition">
                     7 ngày
                 </button>
                 <button type="button" id="btn-chart-6m" onclick="switchChartView('6m')" class="px-3 py-1.5 text-xs font-medium rounded-lg text-slate-600 hover:text-slate-900 transition">
@@ -180,7 +180,7 @@ $topProducts = $dashService->getTopSellingProducts(5);
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         <!-- BẢNG 1: 6 Đơn hàng mới nhất -->
-        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-none overflow-hidden flex flex-col">
             <div class="p-5 border-b border-slate-100 flex items-center justify-between">
                 <div>
                     <h3 class="text-sm font-bold text-slate-900">Đơn hàng mới tiếp nhận</h3>
@@ -224,7 +224,7 @@ $topProducts = $dashService->getTopSellingProducts(5);
                                         <?= $order['tongtien_fmt'] ?>
                                     </td>
                                     <td class="py-3 px-4 text-center">
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold <?= $order['status_meta']['badge_class'] ?>">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold <?= $order['status_meta']['badge_class'] ?>">
                                             <?= htmlspecialchars($order['status_meta']['label']) ?>
                                         </span>
                                     </td>
@@ -243,13 +243,13 @@ $topProducts = $dashService->getTopSellingProducts(5);
         </div>
 
         <!-- BẢNG 2: Cảnh báo Tồn kho thấp & Nhập hàng nhanh -->
-        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-none overflow-hidden flex flex-col">
             <div class="p-5 border-b border-slate-100 flex items-center justify-between">
                 <div>
                     <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
                         <span>Cảnh báo Linh kiện sắp hết</span>
                         <?php if (!empty($lowStockAlerts)): ?>
-                            <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+                            <span class="w-2 h-2 rounded-md bg-rose-500 animate-ping"></span>
                         <?php endif; ?>
                     </h3>
                     <p class="text-xs text-slate-500 mt-0.5">Linh kiện có số lượng tồn ≤ 5 cần lập phiếu nhập kho bổ sung</p>
@@ -302,11 +302,11 @@ $topProducts = $dashService->getTopSellingProducts(5);
                                     </td>
                                     <td class="py-3 px-4 text-center">
                                         <?php if ((int)$item['soluongton'] === 0): ?>
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-700">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-rose-100 text-rose-700">
                                                 Hết hàng (0)
                                             </span>
                                         <?php else: ?>
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-amber-100 text-amber-800">
                                                 Còn <?= (int)$item['soluongton'] ?> cái
                                             </span>
                                         <?php endif; ?>
@@ -408,7 +408,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 label += ': ';
                             }
                             if (context.datasetIndex === 0) {
-                                label += new Intl.NumberFormat('vi-VN').format(context.parsed.y) + ' ₫';
+                                label += new Intl.NumberFormat('vi-VN').format(context.parsed.y) + ' đ';
                             } else {
                                 label += context.parsed.y + ' đơn';
                             }
@@ -463,7 +463,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const label = document.getElementById('chart-view-label');
 
         if (mode === '7d') {
-            btn7d.className = 'px-3 py-1.5 text-xs font-bold rounded-lg bg-white text-red-600 shadow-sm transition';
+            btn7d.className = 'px-3 py-1.5 text-xs font-bold rounded-lg bg-white text-red-600 shadow-none transition';
             btn6m.className = 'px-3 py-1.5 text-xs font-medium rounded-lg text-slate-600 hover:text-slate-900 transition';
             label.textContent = '(7 ngày gần nhất)';
             
@@ -471,7 +471,7 @@ document.addEventListener('DOMContentLoaded', function () {
             window.mainRevenueChart.data.datasets[0].data = data7d.revenues;
             window.mainRevenueChart.data.datasets[1].data = data7d.orders;
         } else {
-            btn6m.className = 'px-3 py-1.5 text-xs font-bold rounded-lg bg-white text-red-600 shadow-sm transition';
+            btn6m.className = 'px-3 py-1.5 text-xs font-bold rounded-lg bg-white text-red-600 shadow-none transition';
             btn7d.className = 'px-3 py-1.5 text-xs font-medium rounded-lg text-slate-600 hover:text-slate-900 transition';
             label.textContent = '(6 tháng gần nhất)';
 

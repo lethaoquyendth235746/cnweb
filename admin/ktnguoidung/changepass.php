@@ -5,12 +5,12 @@
     <div class="col-12 col-md-10 m-auto">
       <div class="card p-5">
         <div class="card-header">          
-          <h4 class="text-info text-center">ĐỔI MẬT KHẨU</h4> 
+          <h4 class="text-info text-center">Đ�"I MẬT KHẨU</h4> 
         </div>
         <div class="card-body">
           
 
-        	<!-- Form đổi mật khẩu -->
+        	<!-- Form �'�.i mật khẩu -->
 		  
 		    
           <form method="post" name="f" action="../ktnguoidung/index.php">
@@ -19,8 +19,8 @@
               <input class="form-control" type="text" name="txtemail" value="<?php echo $_SESSION["nguoidung"]["email"]; ?>" readonly>
             </div>
             <div class="my-3">  
-	            <label>Mật khẩu mới</label>      
-	            <input class="form-control" type="password" name="txtmatkhaumoi" placeholder="Mật khẩu mới" required>
+	            <label>Mật khẩu m�>i</label>      
+	            <input class="form-control" type="password" name="txtmatkhaumoi" placeholder="Mật khẩu m�>i" required>
             </div>            
             <div class="my-3 text-center">
             <input type="hidden" name="action" value="doimatkhau" >

@@ -127,7 +127,7 @@ require_once __DIR__ . '/inc/layout_header.php';
             </p>
         </div>
         <div class="flex items-center gap-2">
-            <button type="button" onclick="openCreateModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white text-xs font-bold rounded-xl transition shadow-sm shadow-red-600/25">
+            <button type="button" onclick="openCreateModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white text-xs font-bold rounded-md transition shadow-none shadow-none/25">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 <span>Thêm linh kiện mới</span>
             </button>
@@ -135,12 +135,12 @@ require_once __DIR__ . '/inc/layout_header.php';
     </div>
 
     <!-- THANH BỘ LỌC ĐA NĂNG -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-none">
         <form action="products.php" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
                 <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Tìm kiếm linh kiện</label>
                 <div class="relative">
-                    <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Tên linh kiện, mã hoặc mô tả..." class="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
+                    <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Tên linh kiện, mã hoặc mô tả..." class="w-full pl-9 pr-3 py-2 text-xs rounded-md bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
@@ -149,7 +149,7 @@ require_once __DIR__ . '/inc/layout_header.php';
 
             <div>
                 <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Danh mục linh kiện</label>
-                <select name="danhmuc_id" class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
+                <select name="danhmuc_id" class="w-full px-3 py-2 text-xs rounded-md bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
                     <option value="">-- Tất cả danh mục --</option>
                     <?php foreach ($categories as $cat): ?>
                         <option value="<?= (int)$cat['id'] ?>" <?= ($danhmucId === (int)$cat['id']) ? 'selected' : '' ?>>
@@ -161,7 +161,7 @@ require_once __DIR__ . '/inc/layout_header.php';
 
             <div>
                 <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Dòng máy tương thích</label>
-                <select name="dongmay" class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
+                <select name="dongmay" class="w-full px-3 py-2 text-xs rounded-md bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
                     <option value="">-- Tất cả dòng máy --</option>
                     <?php foreach ($droneModels as $model): ?>
                         <option value="<?= htmlspecialchars($model) ?>" <?= ($dongmay === $model) ? 'selected' : '' ?>>
@@ -172,11 +172,11 @@ require_once __DIR__ . '/inc/layout_header.php';
             </div>
 
             <div class="flex items-end gap-2">
-                <button type="submit" class="flex-1 py-2 px-4 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition shadow-sm flex items-center justify-center gap-1.5">
+                <button type="submit" class="flex-1 py-2 px-4 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-md transition shadow-none flex items-center justify-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
                     <span>Lọc sản phẩm</span>
                 </button>
-                <a href="products.php" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition" title="Xóa bộ lọc">
+                <a href="products.php" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-md transition" title="Xóa bộ lọc">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                 </a>
             </div>
@@ -184,7 +184,7 @@ require_once __DIR__ . '/inc/layout_header.php';
     </div>
 
     <!-- BẢNG DANH SÁCH LINH KIỆN -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-none overflow-hidden flex flex-col">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
                 <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
@@ -214,7 +214,7 @@ require_once __DIR__ . '/inc/layout_header.php';
                             <tr class="table-hover-row transition-colors">
                                 <td class="py-3.5 px-4">
                                     <div class="flex items-center gap-3">
-                                        <img src="<?= htmlspecialchars($imgUrl) ?>" alt="Product" class="w-12 h-12 rounded-xl object-cover border border-slate-200 flex-shrink-0" onerror="this.onerror=null; this.src='../images/products/no-image.png';">
+                                        <img src="<?= htmlspecialchars($imgUrl) ?>" alt="Product" class="w-12 h-12 rounded-md object-cover border border-slate-200 flex-shrink-0" onerror="this.onerror=null; this.src='../images/products/no-image.png';">
                                         <div class="min-w-0 max-w-[220px]">
                                             <div class="font-bold text-slate-900 text-sm truncate" title="<?= htmlspecialchars($p['tenmathang']) ?>">
                                                 <?= htmlspecialchars($p['tenmathang']) ?>
@@ -241,15 +241,15 @@ require_once __DIR__ . '/inc/layout_header.php';
                                 </td>
                                 <td class="py-3.5 px-4 text-center whitespace-nowrap">
                                     <?php if ($ton === 0): ?>
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-700">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-rose-100 text-rose-700">
                                             Hết hàng (0)
                                         </span>
                                     <?php elseif ($ton <= 5): ?>
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-amber-100 text-amber-800">
                                             Tồn ít (<?= $ton ?>)
                                         </span>
                                     <?php else: ?>
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-700">
                                             <?= $ton ?> cái
                                         </span>
                                     <?php endif; ?>
@@ -304,12 +304,12 @@ require_once __DIR__ . '/inc/layout_header.php';
      MODAL THÊM MỚI / CHỈNH SỬA SẢN PHẨM
      ========================================== -->
 <div id="product-modal" class="modal-overlay modal-hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="modal-container bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
+    <div class="modal-container bg-white w-full max-w-2xl rounded-3xl shadow-none border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
         
         <!-- Header Modal -->
         <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
             <h3 id="product-modal-title" class="text-base font-extrabold text-slate-900">Thêm linh kiện Drone mới</h3>
-            <button type="button" onclick="closeModal('product-modal')" class="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-200 transition">
+            <button type="button" onclick="closeModal('product-modal')" class="p-2 text-slate-400 hover:text-slate-600 rounded-md hover:bg-slate-200 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
@@ -321,13 +321,13 @@ require_once __DIR__ . '/inc/layout_header.php';
 
             <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">Tên linh kiện / Máy bay Drone XAG <span class="text-rose-500">*</span></label>
-                <input type="text" name="tenmathang" id="input-tenmathang" required placeholder="Ví dụ: Cánh quạt Drone XAG P100 Pro (Cặp)" class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                <input type="text" name="tenmathang" id="input-tenmathang" required placeholder="Ví dụ: Cánh quạt Drone XAG P100 Pro (Cặp)" class="w-full text-xs px-3.5 py-2.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">Danh mục linh kiện <span class="text-rose-500">*</span></label>
-                    <select name="danhmuc_id" id="input-danhmuc-id" required class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                    <select name="danhmuc_id" id="input-danhmuc-id" required class="w-full text-xs px-3.5 py-2.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
                         <option value="">-- Chọn danh mục --</option>
                         <?php foreach ($categories as $cat): ?>
                             <option value="<?= (int)$cat['id'] ?>"><?= htmlspecialchars($cat['tendanhmuc']) ?></option>
@@ -337,7 +337,7 @@ require_once __DIR__ . '/inc/layout_header.php';
 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">Dòng máy tương thích (dongmay)</label>
-                    <select name="dongmay" id="input-dongmay" class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                    <select name="dongmay" id="input-dongmay" class="w-full text-xs px-3.5 py-2.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
                         <option value="">Dùng chung / Tất cả model</option>
                         <?php foreach ($droneModels as $model): ?>
                             <option value="<?= htmlspecialchars($model) ?>"><?= htmlspecialchars($model) ?></option>
@@ -349,38 +349,38 @@ require_once __DIR__ . '/inc/layout_header.php';
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">Giá gốc nhập (VNĐ)</label>
-                    <input type="number" name="giagoc" id="input-giagoc" min="0" step="1000" placeholder="0" class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                    <input type="number" name="giagoc" id="input-giagoc" min="0" step="1000" placeholder="0" class="w-full text-xs px-3.5 py-2.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">Giá bán ra (VNĐ) <span class="text-rose-500">*</span></label>
-                    <input type="number" name="giaban" id="input-giaban" required min="0" step="1000" placeholder="0" class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                    <input type="number" name="giaban" id="input-giaban" required min="0" step="1000" placeholder="0" class="w-full text-xs px-3.5 py-2.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">Tồn kho ban đầu</label>
-                    <input type="number" name="soluongton" id="input-soluongton" min="0" value="0" class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                    <input type="number" name="soluongton" id="input-soluongton" min="0" value="0" class="w-full text-xs px-3.5 py-2.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
                 </div>
             </div>
 
             <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">Mô tả thông số kỹ thuật</label>
-                <textarea name="mota" id="input-mota" rows="3" placeholder="Thông số động cơ, sải cánh, điện áp, chuẩn chống nước IPX..." class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500"></textarea>
+                <textarea name="mota" id="input-mota" rows="3" placeholder="Thông số động cơ, sải cánh, điện áp, chuẩn chống nước IPX..." class="w-full text-xs px-3.5 py-2.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500"></textarea>
             </div>
 
             <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">Hình ảnh sản phẩm (JPG, PNG, WEBP)</label>
                 <div class="flex items-center gap-4 mt-1">
-                    <img id="product-img-preview" src="../images/products/no-image.png" class="w-16 h-16 rounded-xl object-cover border border-slate-200" alt="Preview">
-                    <input type="file" name="hinhanh" accept="image/*" data-preview-target="product-img-preview" class="text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100">
+                    <img id="product-img-preview" src="../images/products/no-image.png" class="w-16 h-16 rounded-md object-cover border border-slate-200" alt="Preview">
+                    <input type="file" name="hinhanh" accept="image/*" data-preview-target="product-img-preview" class="text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100">
                 </div>
             </div>
 
             <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
-                <button type="button" onclick="closeModal('product-modal')" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">
+                <button type="button" onclick="closeModal('product-modal')" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-md transition">
                     Hủy bỏ
                 </button>
-                <button type="submit" id="product-modal-submit-btn" class="px-5 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold text-xs rounded-xl transition shadow-md shadow-red-600/25">
+                <button type="submit" id="product-modal-submit-btn" class="px-5 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold text-xs rounded-md transition shadow-none shadow-none/25">
                     Lưu linh kiện
                 </button>
             </div>
@@ -393,8 +393,8 @@ require_once __DIR__ . '/inc/layout_header.php';
      MODAL XÁC NHẬN XÓA SẢN PHẨM (SUPER ADMIN)
      ========================================== -->
 <div id="delete-modal" class="modal-overlay modal-hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="modal-container bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-100 p-6 text-center">
-        <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4">
+    <div class="modal-container bg-white w-full max-w-md rounded-3xl shadow-none border border-slate-100 p-6 text-center">
+        <div class="w-12 h-12 rounded-md bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
         </div>
         <h3 class="text-base font-extrabold text-slate-900 mb-1">Xác nhận xóa linh kiện?</h3>
@@ -404,10 +404,10 @@ require_once __DIR__ . '/inc/layout_header.php';
         <form action="products.php" method="POST" class="flex items-center justify-center gap-2">
             <input type="hidden" name="action" value="delete_product">
             <input type="hidden" name="product_id" id="delete-product-id" value="">
-            <button type="button" onclick="closeModal('delete-modal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">
+            <button type="button" onclick="closeModal('delete-modal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-md transition">
                 Hủy bỏ
             </button>
-            <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl transition shadow-md shadow-rose-600/30">
+            <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-md transition shadow-none shadow-none/30">
                 Xóa vĩnh viễn
             </button>
         </form>

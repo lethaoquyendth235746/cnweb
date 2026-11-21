@@ -2,7 +2,7 @@
 <div>
   <h3>Thêm tài khoản người dùng</h3>
   
-  <!-- Form thêm mới -->
+  <!-- Form thêm m�>i -->
   
   <div>
     <form method="post">
@@ -11,14 +11,14 @@
       </div>
       <div class="my-3"><input class="form-control"  type="text" name="txtmatkhau" placeholder="Mật khẩu" required></div>
       <div class="my-3">        
-      <input class="form-control" type="number" name="txtdienthoai" placeholder="Số điện thoại" required>
+      <input class="form-control" type="number" name="txtdienthoai" placeholder="S�' �'i�?n thoại" required>
       </div>
       <div class="my-3">
       <input class="form-control"  type="text" name="txthoten" placeholder="Họ tên" required></div>
       <div class="my-3">
       <label>Chọn quyền</label>
       <select class="form-control" name="optloaind">                
-          <option value="1">Quản trị</option>
+          <option value="1">Quản tr�<</option>
           <option value="2" selected>Thành viên</option>
           <option value="3">Khách hàng</option>
       </select></div>
@@ -32,3 +32,4 @@
 
 </div>
 <?php include("../inc/bottom.php"); ?>
+

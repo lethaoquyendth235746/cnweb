@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
 	<meta charset="utf-8">
@@ -8,7 +8,7 @@
 	
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 
-	<title>Trang quản trị - LPT DRONE</title>
+	<title>Trang quản trị - XAG DRONE</title>
 
 	<link href="../inc/css/app.css" rel="stylesheet">
     <link href="../css/admin-style.css" rel="stylesheet">
@@ -22,7 +22,7 @@
 		<nav id="sidebar" class="sidebar js-sidebar">
 			<div class="sidebar-content js-simplebar">
 				<a class="sidebar-brand" href="">
-          <span class="align-middle">LPT DRONE</span>
+          <span class="align-middle">XAG DRONE</span>
         <div class="sidebar-panel text-white text-center mt-2" style="font-size:0.9rem;">ADMIN PANEL</div>
         </a>
 
@@ -66,19 +66,19 @@
 					</li>
 					
 					<li class="sidebar-item">
-						<a class="sidebar-link" href="">
+						<a class="sidebar-link" href="../customers.php">
 						<i class="align-middle" data-feather="users"></i> <span class="align-middle">Quản lý khách hàng</span>
 						</a>
 					</li>
 
 					<li class="sidebar-item">
-						<a class="sidebar-link" href="">
+						<a class="sidebar-link" href="../orders.php">
 						<i class="align-middle" data-feather="truck"></i> <span class="align-middle">Quản lý đơn hàng</span>
 						</a>
 					</li>
 
 					<li class="sidebar-item">
-						<a class="sidebar-link" href="">
+						<a class="sidebar-link" href="../index.php">
 						<i class="align-middle" data-feather="bar-chart-2"></i> <span class="align-middle">Quản lý doanh thu</span>
 						</a>
 					</li>
@@ -166,11 +166,11 @@
 									<a href="#" class="list-group-item">
 										<div class="row g-0 align-items-center">
 											<div class="col-2">
-												<img src="../../images/users/doraemon.jpg" class="avatar img-fluid rounded-circle" alt="Mèo máy Đô rê mon">
+												<img src="../../images/users/user.png" class="avatar img-fluid rounded-circle" alt="Avatar">
 											</div>
 											<div class="col-10 ps-2">
-												<div class="text-dark">Doraemon</div>
-												<div class="text-muted small mt-1">Mail của mèo máy đến từ tương lai nè ^.^</div>
+												<div class="text-dark">XAG Bot</div>
+												<div class="text-muted small mt-1">Thông báo hỗ trợ kỹ thuật trực tuyến</div>
 												<div class="text-muted small mt-1">15 phút trước</div>
 											</div>
 										</div>
@@ -188,8 +188,8 @@
               </a>
 
 							<a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
-								<img src="<?php if ($_SESSION["nguoidung"]["hinhanh"]==NULL) echo "../../images/users/user.png"; else echo "../../images/users/" . $_SESSION["nguoidung"]["hinhanh"]; ?>" class="avatar img-fluid rounded me-1" /> 
-								<span class="text-dark">Chào <?php if(isset($_SESSION["nguoidung"])) echo $_SESSION["nguoidung"]["hoten"]; else echo "bạn"; ?></span>
+								<img src="<?php if (empty($_SESSION["nguoidung"]["hinhanh"])) echo "../../images/users/user.png"; else echo "../../images/users/" . basename($_SESSION["nguoidung"]["hinhanh"]); ?>" class="avatar img-fluid rounded me-1" /> 
+								<span class="text-dark">Chào <?php if(isset($_SESSION["nguoidung"])) echo htmlspecialchars($_SESSION["nguoidung"]["hoten"]); else echo "bạn"; ?></span>
 							</a>
 							<div class="dropdown-menu dropdown-menu-end">
 							

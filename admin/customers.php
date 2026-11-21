@@ -79,7 +79,7 @@ $filters = [
 $data = $customerService->getAllCustomers($filters);
 $customers = $data['customers'];
 $totalCustomers = $data['total'];
-$totalPages = ceil($totalCustomers / $limit);
+$totalPages = (int)ceil($totalCustomers / $limit);
 
 require_once __DIR__ . '/inc/layout_header.php';
 ?>
@@ -95,19 +95,19 @@ require_once __DIR__ . '/inc/layout_header.php';
             </p>
         </div>
         <div class="flex items-center gap-2">
-            <span class="text-xs font-semibold px-3 py-1.5 bg-slate-100 text-slate-600 rounded-xl">
+            <span class="text-xs font-semibold px-3 py-1.5 bg-slate-100 text-slate-600 rounded-md">
                 Tổng cộng: <strong class="text-slate-900 font-mono-num"><?= number_format($totalCustomers) ?></strong> thành viên
             </span>
         </div>
     </div>
 
     <!-- THANH TÌM KIẾM & BỘ LỌC -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-none">
         <form action="customers.php" method="GET" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
                 <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Tìm kiếm khách hàng</label>
                 <div class="relative">
-                    <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Tên khách hàng, email, SĐT..." class="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
+                    <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Tên khách hàng, email, SĐT..." class="w-full pl-9 pr-3 py-2 text-xs rounded-md bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
@@ -116,7 +116,7 @@ require_once __DIR__ . '/inc/layout_header.php';
 
             <div>
                 <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Trạng thái tài khoản</label>
-                <select name="trangthai" class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
+                <select name="trangthai" class="w-full px-3 py-2 text-xs rounded-md bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
                     <option value="">-- Tất cả trạng thái --</option>
                     <option value="1" <?= ($trangthai === 1) ? 'selected' : '' ?>>Đang hoạt động</option>
                     <option value="0" <?= ($trangthai === 0) ? 'selected' : '' ?>>Đang bị khóa</option>
@@ -124,11 +124,11 @@ require_once __DIR__ . '/inc/layout_header.php';
             </div>
 
             <div class="flex items-end gap-2">
-                <button type="submit" class="flex-1 py-2 px-4 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition shadow-sm flex items-center justify-center gap-1.5">
+                <button type="submit" class="flex-1 py-2 px-4 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-md transition shadow-none flex items-center justify-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
                     <span>Lọc danh sách</span>
                 </button>
-                <a href="customers.php" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition" title="Xóa bộ lọc">
+                <a href="customers.php" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-md transition" title="Xóa bộ lọc">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                 </a>
             </div>
@@ -136,7 +136,7 @@ require_once __DIR__ . '/inc/layout_header.php';
     </div>
 
     <!-- BẢNG DANH SÁCH KHÁCH HÀNG -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-none overflow-hidden flex flex-col">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
                 <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
@@ -163,7 +163,7 @@ require_once __DIR__ . '/inc/layout_header.php';
                             <tr class="table-hover-row transition-colors">
                                 <td class="py-3.5 px-4">
                                     <div class="flex items-center gap-3">
-                                        <img src="../images/users/user.png" class="w-10 h-10 rounded-full object-cover border border-slate-200" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=<?= urlencode($c['hoten']) ?>&background=dc2626&color=fff';">
+                                        <img src="../images/users/user.png" class="w-10 h-10 rounded-md object-cover border border-slate-200" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=<?= urlencode($c['hoten']) ?>&background=dc2626&color=fff';">
                                         <div>
                                             <div class="font-bold text-slate-900 text-sm"><?= htmlspecialchars($c['hoten']) ?></div>
                                             <div class="text-[11px] text-slate-400 font-mono">ID: #<?= (int)$c['id'] ?></div>
@@ -175,7 +175,7 @@ require_once __DIR__ . '/inc/layout_header.php';
                                     <div class="text-slate-400 text-[11px] mt-0.5"><?= htmlspecialchars($c['email']) ?></div>
                                 </td>
                                 <td class="py-3.5 px-4 text-center">
-                                    <a href="orders.php?search=<?= urlencode($c['hoten']) ?>" class="inline-flex items-center gap-1 font-bold px-2.5 py-1 rounded-full text-xs <?= ($c['tong_don'] > 0) ? 'bg-red-50 text-red-700' : 'bg-slate-100 text-slate-500' ?>">
+                                    <a href="orders.php?search=<?= urlencode($c['hoten']) ?>" class="inline-flex items-center gap-1 font-bold px-2.5 py-1 rounded-md text-xs <?= ($c['tong_don'] > 0) ? 'bg-red-50 text-red-700' : 'bg-slate-100 text-slate-500' ?>">
                                         <?= (int)$c['tong_don'] ?> đơn
                                     </a>
                                 </td>
@@ -183,7 +183,7 @@ require_once __DIR__ . '/inc/layout_header.php';
                                     <?= $c['tong_chi_tieu_fmt'] ?>
                                 </td>
                                 <td class="py-3.5 px-4 text-center whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold <?= $c['status_badge_class'] ?>">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold <?= $c['status_badge_class'] ?>">
                                         <?= htmlspecialchars($c['status_label']) ?>
                                     </span>
                                 </td>
@@ -236,14 +236,14 @@ require_once __DIR__ . '/inc/layout_header.php';
      MODAL CHI TIẾT KHÁCH HÀNG & LỊCH SỬ MUA
      ========================================== -->
 <div id="customer-detail-modal" class="modal-overlay modal-hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="modal-container bg-white w-full max-w-3xl rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
+    <div class="modal-container bg-white w-full max-w-3xl rounded-3xl shadow-none border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
         
         <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
             <div>
                 <h3 id="cmodal-name" class="text-base font-extrabold text-slate-900">Hồ sơ khách hàng</h3>
                 <p id="cmodal-contact" class="text-xs text-slate-500 mt-0.5">SĐT: --- • Email: ---</p>
             </div>
-            <button type="button" onclick="closeModal('customer-detail-modal')" class="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-200 transition">
+            <button type="button" onclick="closeModal('customer-detail-modal')" class="p-2 text-slate-400 hover:text-slate-600 rounded-md hover:bg-slate-200 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
@@ -281,7 +281,7 @@ require_once __DIR__ . '/inc/layout_header.php';
         </div>
 
         <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end">
-            <button type="button" onclick="closeModal('customer-detail-modal')" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl transition">
+            <button type="button" onclick="closeModal('customer-detail-modal')" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-md transition">
                 Đóng cửa sổ
             </button>
         </div>
@@ -308,10 +308,10 @@ function openCustomerDetail(customerId) {
             if (data.addresses && data.addresses.length > 0) {
                 data.addresses.forEach(a => {
                     const el = document.createElement('div');
-                    el.className = 'p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 flex items-center justify-between';
+                    el.className = 'p-3 rounded-md bg-slate-50 border border-slate-200 text-xs text-slate-700 flex items-center justify-between';
                     el.innerHTML = `
                         <div class="flex items-center gap-2">
-                            <span class="text-slate-400">📍</span>
+                            <svg class="w-4 h-4 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                             <span>${a.diachi}</span>
                         </div>
                         ${a.macdinh == 1 ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Mặc định</span>' : ''}
@@ -333,7 +333,7 @@ function openCustomerDetail(customerId) {
                         <td class="py-2.5 px-3 text-slate-500 font-mono-num">${o.ngay_fmt || o.ngay}</td>
                         <td class="py-2.5 px-3 text-right font-bold text-slate-900 font-mono-num">${o.tongtien_fmt}</td>
                         <td class="py-2.5 px-3 text-center">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${o.status_meta.badge_class}">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold ${o.status_meta.badge_class}">
                                 ${o.status_meta.label}
                             </span>
                         </td>

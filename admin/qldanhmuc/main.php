@@ -5,7 +5,7 @@
 	<tr><th>ID</th><th>Tên danh mục</th><th>Sửa</th><th>Xóa</th></tr>
 	<?php 
 	foreach ($danhmuc as $d) : 
-		if($d["id"] == $idsua){ // hiển thị form
+		if($d["id"] == $idsua){ // hi�fn th�< form
 	?>
 		<tr>
 		<form method="post">
@@ -34,7 +34,7 @@
 	?>
 </table>
 
-<h4><a class="text-decoration-none text-info" data-bs-toggle="collapse" data-bs-target="#demo">Thêm mới</a><h4>
+<h4><a class="text-decoration-none text-info" data-bs-toggle="collapse" data-bs-target="#demo">Thêm m�>i</a><h4>
 
 <div id="demo" class="collapse">
 	 
@@ -54,3 +54,4 @@
 
 
 <?php include("../inc/bottom.php"); ?>
+

@@ -1,18 +1,18 @@
 <?php include("../inc/top.php"); ?>
 <div>
   <h3>Quản lý người dùng</h3>
-  <!-- Thông báo lỗi nếu có -->
+  <!-- Thông báo l�-i nếu có -->
   <?php
   if(isset($tb)){ 
   ?>  
   <div class="alert alert-danger alert-dismissible fade show">
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    <strong>Lỗi!</strong> <?php echo $tb; ?>
+    <strong>L�-i!</strong> <?php echo $tb; ?>
   </div>
   <?php
   }
   ?>
-  <!-- Mở form thêm mới -->
+  <!-- M�Y form thêm m�>i -->
   <div><a class="btn btn-primary" href="index.php?action=them"><span class="glyphicon glyphicon-plus"></span> Thêm người dùng</a></div>
 
   <br>
@@ -21,7 +21,7 @@
   <table class="table table-hover">
         <tr>
 		<th><a href="index.php?sort=email">Email</a></th>
-		<th><a href="index.php?sort=sodienthoai">Số điện thoại</a></th>
+		<th><a href="index.php?sort=sodienthoai">S�' �'i�?n thoại</a></th>
 		<th><a href="index.php?sort=hoten">Họ tên</a></th>
 		<th><a href="index.php?sort=loai">Loại quyền</a></th>
 		<th>Trạng thái</th>
@@ -30,7 +30,7 @@
         <tr><td><?php echo $nd["email"]; ?></td>
         	<td><?php echo $nd["sodienthoai"]; ?></td>
 			<td><?php echo $nd["hoten"]; ?></td>
-        	<td><?php if($nd["loai"]==1) echo "Quản trị";elseif($nd["loai"]==2) echo "Nhân viên"; else echo "Khách hàng" ; ?></td>
+        	<td><?php if($nd["loai"]==1) echo "Quản tr�<";elseif($nd["loai"]==2) echo "Nhân viên"; else echo "Khách hàng" ; ?></td>
           <td><?php if($nd["loai"]!=1) {if($nd["trangthai"]==1) echo "Kích hoạt"; else echo "Khóa" ; }?></td>
           <td>
           <?php 
@@ -49,3 +49,4 @@
 
 </div>
 <?php include("../inc/bottom.php"); ?>
+

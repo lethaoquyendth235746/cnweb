@@ -21,7 +21,7 @@
 	<textarea class="form-control" name="txtmota" id="txtmota" required><?php echo $m["mota"]; ?></textarea>
 </div> 
 <div class="my-3">    
-	<label>Giá gốc</label>    
+	<label>Giá g�'c</label>    
 	<input class="form-control" type="number" name="txtgiagoc" value="<?php echo $m["giagoc"]; ?>" required>
 </div> 
 <div class="my-3">    
@@ -29,7 +29,7 @@
 	<input class="form-control" type="number" name="txtgiaban" value="<?php echo $m["giaban"]; ?>" required>
 </div> 
 <div class="my-3">    
-	<label>Số lượng tồn</label>    
+	<label>S�' lượng t�"n</label>    
 	<input class="form-control" type="number" name="txtsoluongton" value="<?php echo $m["soluongton"]; ?>" required>
 	</div> 
 <div class="my-3">    
@@ -44,7 +44,7 @@
 	<label>Hình ảnh</label><br>
 	<input type="hidden" name="txthinhcu" value="<?php echo $m["hinhanh"]; ?>">
 	<img src="../../<?php echo $m["hinhanh"]; ?>" width="50" class="img-thumbnail">	
-	<a data-bs-toggle="collapse" data-bs-target="#demo">Đổi hình ảnh</a>
+	<a data-bs-toggle="collapse" data-bs-target="#demo">Đ�.i hình ảnh</a>
 	<div id="demo" class="collapse m-3">
 	  <input type="file" class="form-control" name="filehinhanh">
 	</div>

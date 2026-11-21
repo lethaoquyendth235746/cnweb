@@ -11,7 +11,7 @@
 	<tr>
 		<th>Tên mặt hàng</th>
 		<th>Giá bán</th>
-		<th>Số lượng</th>
+		<th>S�' lượng</th>
 		<th>Hình ảnh</th>		
 		<th>Sửa</th>
 		<th>Xóa</th>
@@ -40,3 +40,4 @@
 </table>
 
 <?php include("../inc/bottom.php"); ?>
+

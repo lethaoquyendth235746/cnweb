@@ -9,17 +9,17 @@ require_once __DIR__ . '/../services/DatabaseService.php';
 if (!function_exists('formatVND')) {
     /**
      * Định dạng số tiền sang định dạng tiền tệ Việt Nam (VNĐ)
-     * Ví dụ: 5500000 -> 5.500.000 ₫
+     * Ví dụ: 5500000 -> 5.500.000 đ
      *
      * @param float|int|string|null $amount
      * @return string
      */
     function formatVND($amount): string {
         if ($amount === null || $amount === '') {
-            return '0 ₫';
+            return '0 đ';
         }
         $val = (float)$amount;
-        return number_format($val, 0, ',', '.') . ' ₫';
+        return number_format($val, 0, ',', '.') . ' đ';
     }
 }
 

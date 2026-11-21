@@ -226,18 +226,16 @@ class DashboardService {
         return $products;
     }
 
-
     /**
      * Alias for low stock alerts – returns items with stock <= threshold.
      * Provides same data as getLowStockProducts but with customizable limit.
      *
      * @param int $threshold Stock threshold (default 5)
      * @param int $limit Maximum number of items to return (default 6)
-     * @return array List of low‑stock products
+     * @return array List of low-stock products
      */
     public function getLowStockAlerts(int $threshold = 5, int $limit = 6): array {
         $items = $this->getLowStockProducts($threshold);
-        // If a specific limit is requested, truncate the result.
         if ($limit > 0 && count($items) > $limit) {
             $items = array_slice($items, 0, $limit);
         }
