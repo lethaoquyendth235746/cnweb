@@ -1,106 +1,86 @@
-        </div><!-- /container -->
-    </main>
+    <!-- FLOATING HOTLINE PILL -->
+    <a href="tel:0833609329" class="floating-hotline-pill text-decoration-none shadow" title="Gọi Hotline kỹ thuật">
+        <i class="bi bi-telephone-inbound-fill"></i>
+        <span>083 609 3229</span>
+    </a>
 
-    <!-- FLOATING HOTLINE WIDGET -->
-    <div class="floating-hotline">
-        <a href="tel:0833609329" class="text-decoration-none" title="Gọi ngay Hotline tư vấn kỹ thuật">
-            <i class="bi bi-telephone-inbound-fill fs-5"></i>
-            <span>Hotline: 0833 609 329</span>
-        </a>
-    </div>
-
-    <!-- MAIN FOOTER (Nền Đen Carbon #111315 với viền đỏ công nghệ #D90429) -->
-    <footer class="main-footer">
+    <!-- SITE FOOTER (DARK CARBON #111315 VỚI ĐIỂM NHẤN ĐỎ) -->
+    <footer class="site-footer">
         <div class="container">
-            <div class="row g-4">
-                <!-- Cột 1: Thông tin thương hiệu & Logo -->
+            <div class="row g-4 pb-4">
+                <!-- Cột 1: Logo & Giới thiệu -->
                 <div class="col-12 col-md-6 col-lg-4">
-                    <div class="footer-brand">
-                        <img src="../images/logo.png" alt="LPT DRONE Logo" />
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <img src="../images/logo.png" alt="LPT DRONE Logo" style="height: 48px; border-radius: 6px;" />
                         <div>
                             <h5 class="text-white fw-bold mb-0">LPT <span class="text-danger">DRONE</span></h5>
-                            <small class="text-secondary text-uppercase fw-semibold">Linh kiện Drone XAG Chính Hãng</small>
+                            <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.7rem;">Sản Phẩm & Linh kiện Drone XAG</small>
                         </div>
                     </div>
                     <p class="small text-secondary mb-3">
-                        LPT DRONE là trung tâm phân phối linh kiện, phụ tùng thay thế và giải pháp sửa chữa máy bay nông nghiệp XAG hàng đầu khu vực ĐBSCL và toàn quốc.
+                        Hệ thống cung cấp phụ tùng, sản phẩm máy bay nông nghiệp XAG chính hãng chuyên nghiệp. Sẵn sàng đồng hành cùng phi công và các trạm dịch vụ trong từng mùa vụ.
                     </p>
-                    <div class="d-flex gap-2">
-                        <span class="badge bg-danger p-2"><i class="bi bi-check-circle-fill me-1"></i> XAG P100 / Pro</span>
-                        <span class="badge bg-secondary p-2"><i class="bi bi-check-circle-fill me-1"></i> XAG P40</span>
-                        <span class="badge bg-secondary p-2"><i class="bi bi-check-circle-fill me-1"></i> XAG V40</span>
-                        <span class="badge bg-secondary p-2"><i class="bi bi-check-circle-fill me-1"></i> Robot R150</span>
+                    <div class="small text-secondary">
+                        <div><i class="bi bi-check2-circle text-danger me-1"></i> Linh kiện chuẩn xuất xưởng 100%</div>
+                        <div><i class="bi bi-truck text-danger me-1"></i> Gửi xe khách, chành xe hỏa tốc trong 24h</div>
                     </div>
                 </div>
 
-                <!-- Cột 2: Danh mục linh kiện -->
-                <div class="col-6 col-md-6 col-lg-2">
-                    <h6 class="footer-title">DANH MỤC PHỤ TÙNG</h6>
-                    <ul class="footer-links">
-                        <li><a href="index.php?action=group&id=1"><i class="bi bi-chevron-right small text-danger me-1"></i> Động cơ (Motor)</a></li>
-                        <li><a href="index.php?action=group&id=2"><i class="bi bi-chevron-right small text-danger me-1"></i> Cánh quạt</a></li>
-                        <li><a href="index.php?action=group&id=3"><i class="bi bi-chevron-right small text-danger me-1"></i> Pin thông minh</a></li>
-                        <li><a href="index.php?action=group&id=4"><i class="bi bi-chevron-right small text-danger me-1"></i> Bơm nhu động</a></li>
-                        <li><a href="index.php?action=group&id=5"><i class="bi bi-chevron-right small text-danger me-1"></i> Vòi phun ly tâm</a></li>
-                        <li><a href="index.php?action=group&id=6"><i class="bi bi-chevron-right small text-danger me-1"></i> Mạch FC / ESC</a></li>
-                        <li><a href="index.php?action=group&id=7"><i class="bi bi-chevron-right small text-danger me-1"></i> Khung sườn & Càng</a></li>
+                <!-- Cột 2: Danh mục sản phẩm -->
+                <div class="col-6 col-md-3 col-lg-2">
+                    <h6 class="footer-heading">DANH MỤC SẢN PHẨM</h6>
+                    <ul class="footer-links-list">
+                        <li><a href="index.php?action=group&id=1">Động cơ (Motor)</a></li>
+                        <li><a href="index.php?action=group&id=2">Cánh quạt</a></li>
+                        <li><a href="index.php?action=group&id=3">Pin thông minh</a></li>
+                        <li><a href="index.php?action=group&id=4">Bơm nhu động</a></li>
+                        <li><a href="index.php?action=group&id=5">Vòi phun ly tâm</a></li>
+                        <li><a href="index.php?action=group&id=6">Mạch FC / ESC</a></li>
+                        <li><a href="index.php?action=group&id=7">Khung sườn & Càng</a></li>
                     </ul>
                 </div>
 
-                <!-- Cột 3: Chính sách & Dịch vụ -->
-                <div class="col-6 col-md-6 col-lg-3">
-                    <h6 class="footer-title">CHÍNH SÁCH BÁN HÀNG</h6>
-                    <ul class="footer-links">
-                        <li><a href="#"><i class="bi bi-shield-check text-danger me-1"></i> Cam kết 100% chính hãng</a></li>
-                        <li><a href="#"><i class="bi bi-arrow-repeat text-danger me-1"></i> Chính sách bảo hành 1 đổi 1</a></li>
-                        <li><a href="#"><i class="bi bi-truck text-danger me-1"></i> Vận chuyển gửi chành xe / bến xe</a></li>
-                        <li><a href="#"><i class="bi bi-wrench-adjustable text-danger me-1"></i> Hỗ trợ cài đặt & thay thế từ xa</a></li>
-                        <li><a href="#"><i class="bi bi-credit-card text-danger me-1"></i> Phương thức thanh toán</a></li>
-                        <li><a href="#"><i class="bi bi-question-circle text-danger me-1"></i> Hướng dẫn đặt hàng trực tuyến</a></li>
+                <!-- Cột 3: Hỗ trợ khách hàng -->
+                <div class="col-6 col-md-3 col-lg-3">
+                    <h6 class="footer-heading">HỖ TRỢ KHÁCH HÀNG</h6>
+                    <ul class="footer-links-list">
+                        <li><a href="#">Chính sách bảo hành 1 đổi 1</a></li>
+                        <li><a href="#">Quy định kiểm tra hàng khi nhận (COD)</a></li>
+                        <li><a href="#">Phương thức giao hàng & gửi chành xe</a></li>
+                        <li><a href="#">Tư vấn chuẩn đoán lỗi máy bay từ xa</a></li>
+                        <li><a href="#">Chính sách bảo mật thông tin</a></li>
                     </ul>
                 </div>
 
-                <!-- Cột 4: Liên hệ & Hỗ trợ kỹ thuật -->
+                <!-- Cột 4: Liên hệ trực tiếp -->
                 <div class="col-12 col-md-6 col-lg-3">
-                    <h6 class="footer-title">HỖ TRỢ & LIÊN HỆ</h6>
-                    <div class="footer-contact-item">
-                        <i class="bi bi-telephone-fill"></i>
-                        <div>
-                            <strong>Hotline kỹ thuật & Đặt hàng:</strong><br>
-                            <a href="tel:0833609329" class="text-danger fw-bold fs-5 text-decoration-none">0833 609 329</a>
-                        </div>
+                    <h6 class="footer-heading">LIÊN HỆ TRỰC TIẾP</h6>
+                    <div class="small text-secondary mb-2">
+                        <span class="text-white fw-bold d-block">Hotline kỹ thuật & Đặt hàng:</span>
+                        <a href="tel:0833609329" class="text-danger fw-bolder fs-5 text-decoration-none">0833 609 329</a>
                     </div>
-                    <div class="footer-contact-item">
-                        <i class="bi bi-geo-alt-fill"></i>
-                        <div>
-                            <strong>Kho hàng & Trạm kỹ thuật:</strong><br>
-                            QL91, Thị trấn Cái Dầu, Châu Phú, An Giang
-                        </div>
+                    <div class="small text-secondary mb-2">
+                        <span class="text-white fw-bold d-block">Kho hàng & Trạm bảo dưỡng:</span>
+                        QL91, TT. Cái Dầu, Châu Thành , Tỉnh An Giang
                     </div>
-                    <div class="footer-contact-item">
-                        <i class="bi bi-clock-fill"></i>
-                        <div>
-                            <strong>Thời gian phục vụ:</strong><br>
-                            7:30 - 21:00 (Hỗ trợ 24/7 mùa vụ cao điểm)
-                        </div>
+                    <div class="small text-secondary mb-2">
+                        <span class="text-white fw-bold d-block">Thời gian phục vụ:</span>
+                        7:30 - 21:00 (Hỗ trợ khẩn cấp mùa vụ 24/7)
                     </div>
-                    <div class="footer-contact-item">
-                        <i class="bi bi-envelope-fill"></i>
-                        <div>
-                            <strong>Email:</strong> hotro@lptdrone.vn
-                        </div>
+                    <div class="small text-secondary">
+                        <span class="text-white fw-bold d-block">Email:</span>
+                        hotro@lptdrone.vn
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Bản quyền chân trang -->
-        <div class="footer-bottom text-center">
+        <div class="footer-bottom-bar text-center">
             <div class="container">
-                <p class="mb-0">
-                    Bản quyền &copy; <?php echo date("Y"); ?> <strong>LPT DRONE</strong> - Chuyên Phụ Tùng & Linh Kiện Drone XAG Nông Nghiệp Chính Hãng.
+                <p class="mb-0 text-muted">
+                    Bản quyền &copy; <?php echo date("Y"); ?> <strong>LPT DRONE</strong>. Tất cả quyền được bảo lưu. Cung cấp sản phẩm phụ tùng XAG chính hãng.
                 </p>
-                <small class="text-secondary">Hotline tư vấn khẩn cấp: 0833 609 329 | Ship COD toàn quốc kiểm tra trước khi nhận</small>
             </div>
         </div>
     </footer>

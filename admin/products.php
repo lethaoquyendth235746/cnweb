@@ -1,0 +1,458 @@
+<?php
+/**
+ * admin/products.php
+ * Quản lý Linh kiện & Máy bay Drone XAG - CRUD & Cột DongMay
+ * Giai đoạn 3: Tailwind CSS + ProductAdminService + PRG Pattern
+ */
+
+$pageTitle = 'Quản lý Linh kiện & Drone';
+require_once __DIR__ . '/includes/auth_middleware.php';
+checkAdminAuth();
+require_once __DIR__ . '/config/db.php';
+require_once __DIR__ . '/services/ProductAdminService.php';
+require_once __DIR__ . '/services/CategoryAdminService.php';
+
+$productService = new ProductAdminService();
+$categoryService = new CategoryAdminService();
+
+// ==========================================
+// 1. XỬ LÝ FORM POST THEO CHUẨN PRG
+// ==========================================
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? '';
+
+    // Thêm mới sản phẩm
+    if ($action === 'create_product') {
+        try {
+            $data = [
+                'tenmathang' => $_POST['tenmathang'] ?? '',
+                'danhmuc_id' => (int)($_POST['danhmuc_id'] ?? 0),
+                'dongmay'    => $_POST['dongmay'] ?? '',
+                'giagoc'     => $_POST['giagoc'] ?? 0,
+                'giaban'     => $_POST['giaban'] ?? 0,
+                'soluongton' => $_POST['soluongton'] ?? 0,
+                'mota'       => $_POST['mota'] ?? ''
+            ];
+            $file = isset($_FILES['hinhanh']) && $_FILES['hinhanh']['error'] !== UPLOAD_ERR_NO_FILE ? $_FILES['hinhanh'] : null;
+
+            $newId = $productService->createProduct($data, $file);
+            setAdminFlash('success', "Đã thêm mới linh kiện [{$data['tenmathang']}] thành công (ID: #{$newId})!");
+        } catch (Throwable $e) {
+            setAdminFlash('danger', 'Lỗi thêm mới: ' . $e->getMessage());
+        }
+
+        header('Location: products.php');
+        exit;
+    }
+
+    // Cập nhật sản phẩm
+    if ($action === 'update_product') {
+        $id = (int)($_POST['product_id'] ?? 0);
+        try {
+            $data = [
+                'tenmathang' => $_POST['tenmathang'] ?? '',
+                'danhmuc_id' => (int)($_POST['danhmuc_id'] ?? 0),
+                'dongmay'    => $_POST['dongmay'] ?? '',
+                'giagoc'     => $_POST['giagoc'] ?? 0,
+                'giaban'     => $_POST['giaban'] ?? 0,
+                'soluongton' => $_POST['soluongton'] ?? 0,
+                'mota'       => $_POST['mota'] ?? ''
+            ];
+            $file = isset($_FILES['hinhanh']) && $_FILES['hinhanh']['error'] !== UPLOAD_ERR_NO_FILE ? $_FILES['hinhanh'] : null;
+
+            $productService->updateProduct($id, $data, $file);
+            setAdminFlash('success', "Đã cập nhật linh kiện #{$id} thành công!");
+        } catch (Throwable $e) {
+            setAdminFlash('danger', 'Lỗi cập nhật: ' . $e->getMessage());
+        }
+
+        header('Location: products.php');
+        exit;
+    }
+
+    // Xóa sản phẩm (Chỉ SuperAdmin)
+    if ($action === 'delete_product') {
+        requireSuperAdmin('products.php');
+        $id = (int)($_POST['product_id'] ?? 0);
+        try {
+            $productService->deleteProduct($id);
+            setAdminFlash('success', "Đã xóa vĩnh viễn linh kiện #{$id} khỏi hệ thống!");
+        } catch (Throwable $e) {
+            setAdminFlash('danger', 'Lỗi xóa sản phẩm: ' . $e->getMessage());
+        }
+
+        header('Location: products.php');
+        exit;
+    }
+}
+
+// ==========================================
+// 2. BỘ LỌC & DANH SÁCH SẢN PHẨM
+// ==========================================
+$search = trim($_GET['search'] ?? '');
+$danhmucId = (isset($_GET['danhmuc_id']) && $_GET['danhmuc_id'] !== '') ? (int)$_GET['danhmuc_id'] : null;
+$dongmay = trim($_GET['dongmay'] ?? '');
+$page = max(1, (int)($_GET['page'] ?? 1));
+$limit = 12;
+$offset = ($page - 1) * $limit;
+
+$filters = [
+    'search'     => $search,
+    'danhmuc_id' => $danhmucId,
+    'dongmay'    => $dongmay,
+    'limit'      => $limit,
+    'offset'     => $offset
+];
+
+$productsData = $productService->getAllProducts($filters);
+$products = $productsData['products'];
+$totalProducts = $productsData['total'];
+$totalPages = ceil($totalProducts / $limit);
+
+$categories = $categoryService->getAllCategoriesWithCount();
+$droneModels = $productService->getDroneModels();
+$isSuper = isSuperAdmin();
+
+require_once __DIR__ . '/inc/layout_header.php';
+?>
+
+<div class="space-y-6">
+
+    <!-- Tiêu đề trang & Nút thêm mới -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Quản lý Linh kiện & Drone XAG</h1>
+            <p class="text-sm text-slate-500 mt-1">
+                Danh mục máy bay nông nghiệp, phụ tùng thay thế chính hãng XAG P100, P40, V40, R150.
+            </p>
+        </div>
+        <div class="flex items-center gap-2">
+            <button type="button" onclick="openCreateModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white text-xs font-bold rounded-xl transition shadow-sm shadow-red-600/25">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                <span>Thêm linh kiện mới</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- THANH BỘ LỌC ĐA NĂNG -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
+        <form action="products.php" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Tìm kiếm linh kiện</label>
+                <div class="relative">
+                    <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Tên linh kiện, mã hoặc mô tả..." class="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Danh mục linh kiện</label>
+                <select name="danhmuc_id" class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
+                    <option value="">-- Tất cả danh mục --</option>
+                    <?php foreach ($categories as $cat): ?>
+                        <option value="<?= (int)$cat['id'] ?>" <?= ($danhmucId === (int)$cat['id']) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($cat['tendanhmuc']) ?> (<?= $cat['tong_san_pham'] ?>)
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Dòng máy tương thích</label>
+                <select name="dongmay" class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
+                    <option value="">-- Tất cả dòng máy --</option>
+                    <?php foreach ($droneModels as $model): ?>
+                        <option value="<?= htmlspecialchars($model) ?>" <?= ($dongmay === $model) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($model) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="flex items-end gap-2">
+                <button type="submit" class="flex-1 py-2 px-4 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition shadow-sm flex items-center justify-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                    <span>Lọc sản phẩm</span>
+                </button>
+                <a href="products.php" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition" title="Xóa bộ lọc">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- BẢNG DANH SÁCH LINH KIỆN -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                    <tr>
+                        <th class="py-3.5 px-4">Linh kiện & Hình ảnh</th>
+                        <th class="py-3.5 px-4">Danh mục</th>
+                        <th class="py-3.5 px-4">Dòng máy XAG</th>
+                        <th class="py-3.5 px-4 text-right">Giá vốn / Giá bán</th>
+                        <th class="py-3.5 px-4 text-center">Tồn kho</th>
+                        <th class="py-3.5 px-4 text-center">Lượt xem/mua</th>
+                        <th class="py-3.5 px-4 text-right">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    <?php if (empty($products)): ?>
+                        <tr>
+                            <td colspan="7" class="py-12 text-center text-slate-400">
+                                <p class="font-medium text-slate-600">Không tìm thấy linh kiện nào phù hợp.</p>
+                                <a href="products.php" class="text-xs text-red-600 hover:underline mt-1">Xóa bộ lọc</a>
+                            </td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($products as $p): 
+                            $imgUrl = !empty($p['hinhanh']) ? '../images/products/' . basename($p['hinhanh']) : '../images/products/no-image.png';
+                            $ton = (int)$p['soluongton'];
+                        ?>
+                            <tr class="table-hover-row transition-colors">
+                                <td class="py-3.5 px-4">
+                                    <div class="flex items-center gap-3">
+                                        <img src="<?= htmlspecialchars($imgUrl) ?>" alt="Product" class="w-12 h-12 rounded-xl object-cover border border-slate-200 flex-shrink-0" onerror="this.onerror=null; this.src='../images/products/no-image.png';">
+                                        <div class="min-w-0 max-w-[220px]">
+                                            <div class="font-bold text-slate-900 text-sm truncate" title="<?= htmlspecialchars($p['tenmathang']) ?>">
+                                                <?= htmlspecialchars($p['tenmathang']) ?>
+                                            </div>
+                                            <div class="text-[11px] text-slate-400 font-mono">ID: #<?= (int)$p['id'] ?></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3.5 px-4 text-slate-700 font-medium">
+                                    <?= htmlspecialchars($p['tendanhmuc']) ?>
+                                </td>
+                                <td class="py-3.5 px-4">
+                                    <?php if (!empty($p['dongmay'])): ?>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-200">
+                                            <?= htmlspecialchars($p['dongmay']) ?>
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="text-slate-400 italic text-[11px]">Dùng chung</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                                    <div class="font-bold text-red-600 text-sm font-mono-num"><?= formatVND($p['giaban']) ?></div>
+                                    <div class="text-[11px] text-slate-400 font-mono-num line-through"><?= formatVND($p['giagoc']) ?></div>
+                                </td>
+                                <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                                    <?php if ($ton === 0): ?>
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-700">
+                                            Hết hàng (0)
+                                        </span>
+                                    <?php elseif ($ton <= 5): ?>
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
+                                            Tồn ít (<?= $ton ?>)
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
+                                            <?= $ton ?> cái
+                                        </span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="py-3.5 px-4 text-center text-slate-500 font-mono-num whitespace-nowrap">
+                                    <div><?= number_format($p['luotmua']) ?> đã mua</div>
+                                    <div class="text-[10px] text-slate-400"><?= number_format($p['luotxem']) ?> xem</div>
+                                </td>
+                                <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <button type="button" onclick='openEditModal(<?= json_encode($p, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>)' class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition" title="Chỉnh sửa linh kiện">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                        </button>
+                                        <?php if ($isSuper): ?>
+                                            <button type="button" onclick="confirmDeleteProduct(<?= (int)$p['id'] ?>, '<?= htmlspecialchars(addslashes($p['tenmathang'])) ?>')" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition" title="Xóa linh kiện">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Phân trang -->
+        <?php if ($totalPages > 1): ?>
+            <div class="px-5 py-4 border-t border-slate-100 flex items-center justify-between">
+                <span class="text-xs text-slate-500">
+                    Trang <strong><?= $page ?></strong> / <strong><?= $totalPages ?></strong> (Tổng <?= number_format($totalProducts) ?> linh kiện)
+                </span>
+                <div class="flex items-center gap-1">
+                    <?php for ($p = 1; $p <= $totalPages; $p++): 
+                        $q = $_GET;
+                        $q['page'] = $p;
+                        $pageUrl = 'products.php?' . http_build_query($q);
+                    ?>
+                        <a href="<?= $pageUrl ?>" class="w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold transition <?= ($p === $page) ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' ?>">
+                            <?= $p ?>
+                        </a>
+                    <?php endfor; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
+
+</div>
+
+<!-- ==========================================
+     MODAL THÊM MỚI / CHỈNH SỬA SẢN PHẨM
+     ========================================== -->
+<div id="product-modal" class="modal-overlay modal-hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="modal-container bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
+        
+        <!-- Header Modal -->
+        <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+            <h3 id="product-modal-title" class="text-base font-extrabold text-slate-900">Thêm linh kiện Drone mới</h3>
+            <button type="button" onclick="closeModal('product-modal')" class="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-200 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+
+        <!-- Form Body -->
+        <form id="product-form" action="products.php" method="POST" enctype="multipart/form-data" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <input type="hidden" name="action" id="product-form-action" value="create_product">
+            <input type="hidden" name="product_id" id="product-form-id" value="">
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Tên linh kiện / Máy bay Drone XAG <span class="text-rose-500">*</span></label>
+                <input type="text" name="tenmathang" id="input-tenmathang" required placeholder="Ví dụ: Cánh quạt Drone XAG P100 Pro (Cặp)" class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Danh mục linh kiện <span class="text-rose-500">*</span></label>
+                    <select name="danhmuc_id" id="input-danhmuc-id" required class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                        <option value="">-- Chọn danh mục --</option>
+                        <?php foreach ($categories as $cat): ?>
+                            <option value="<?= (int)$cat['id'] ?>"><?= htmlspecialchars($cat['tendanhmuc']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Dòng máy tương thích (dongmay)</label>
+                    <select name="dongmay" id="input-dongmay" class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                        <option value="">Dùng chung / Tất cả model</option>
+                        <?php foreach ($droneModels as $model): ?>
+                            <option value="<?= htmlspecialchars($model) ?>"><?= htmlspecialchars($model) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Giá gốc nhập (VNĐ)</label>
+                    <input type="number" name="giagoc" id="input-giagoc" min="0" step="1000" placeholder="0" class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Giá bán ra (VNĐ) <span class="text-rose-500">*</span></label>
+                    <input type="number" name="giaban" id="input-giaban" required min="0" step="1000" placeholder="0" class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Tồn kho ban đầu</label>
+                    <input type="number" name="soluongton" id="input-soluongton" min="0" value="0" class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Mô tả thông số kỹ thuật</label>
+                <textarea name="mota" id="input-mota" rows="3" placeholder="Thông số động cơ, sải cánh, điện áp, chuẩn chống nước IPX..." class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Hình ảnh sản phẩm (JPG, PNG, WEBP)</label>
+                <div class="flex items-center gap-4 mt-1">
+                    <img id="product-img-preview" src="../images/products/no-image.png" class="w-16 h-16 rounded-xl object-cover border border-slate-200" alt="Preview">
+                    <input type="file" name="hinhanh" accept="image/*" data-preview-target="product-img-preview" class="text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100">
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
+                <button type="button" onclick="closeModal('product-modal')" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">
+                    Hủy bỏ
+                </button>
+                <button type="submit" id="product-modal-submit-btn" class="px-5 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold text-xs rounded-xl transition shadow-md shadow-red-600/25">
+                    Lưu linh kiện
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<!-- ==========================================
+     MODAL XÁC NHẬN XÓA SẢN PHẨM (SUPER ADMIN)
+     ========================================== -->
+<div id="delete-modal" class="modal-overlay modal-hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="modal-container bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-100 p-6 text-center">
+        <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        </div>
+        <h3 class="text-base font-extrabold text-slate-900 mb-1">Xác nhận xóa linh kiện?</h3>
+        <p class="text-xs text-slate-500 mb-4">
+            Bạn có chắc chắn muốn xóa vĩnh viễn linh kiện <strong id="delete-product-name" class="text-slate-800"></strong>? Thao tác này không thể hoàn tác.
+        </p>
+        <form action="products.php" method="POST" class="flex items-center justify-center gap-2">
+            <input type="hidden" name="action" value="delete_product">
+            <input type="hidden" name="product_id" id="delete-product-id" value="">
+            <button type="button" onclick="closeModal('delete-modal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">
+                Hủy bỏ
+            </button>
+            <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl transition shadow-md shadow-rose-600/30">
+                Xóa vĩnh viễn
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openCreateModal() {
+    document.getElementById('product-modal-title').textContent = 'Thêm mới Linh kiện & Drone XAG';
+    document.getElementById('product-form-action').value = 'create_product';
+    document.getElementById('product-form-id').value = '';
+    document.getElementById('product-form').reset();
+    document.getElementById('product-img-preview').src = '../images/products/no-image.png';
+    document.getElementById('product-modal-submit-btn').textContent = 'Thêm linh kiện';
+    openModal('product-modal');
+}
+
+function openEditModal(prod) {
+    document.getElementById('product-modal-title').textContent = 'Chỉnh sửa linh kiện #' + prod.id;
+    document.getElementById('product-form-action').value = 'update_product';
+    document.getElementById('product-form-id').value = prod.id;
+    document.getElementById('input-tenmathang').value = prod.tenmathang || '';
+    document.getElementById('input-danhmuc-id').value = prod.danhmuc_id || '';
+    document.getElementById('input-dongmay').value = prod.dongmay || '';
+    document.getElementById('input-giagoc').value = prod.giagoc || 0;
+    document.getElementById('input-giaban').value = prod.giaban || 0;
+    document.getElementById('input-soluongton').value = prod.soluongton || 0;
+    document.getElementById('input-mota').value = prod.mota || '';
+
+    const imgPreview = document.getElementById('product-img-preview');
+    if (prod.hinhanh) {
+        imgPreview.src = '../images/products/' + prod.hinhanh.split('/').pop();
+    } else {
+        imgPreview.src = '../images/products/no-image.png';
+    }
+
+    document.getElementById('product-modal-submit-btn').textContent = 'Lưu thay đổi';
+    openModal('product-modal');
+}
+
+function confirmDeleteProduct(id, name) {
+    document.getElementById('delete-product-id').value = id;
+    document.getElementById('delete-product-name').textContent = name;
+    openModal('delete-modal');
+}
+</script>
+
+<?php require_once __DIR__ . '/inc/layout_footer.php'; ?>

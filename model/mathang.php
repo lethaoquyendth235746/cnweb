@@ -281,5 +281,62 @@ class MATHANG{
         }
     }
 
+    // Bộ lọc đa năng chuẩn E-commerce Shopify (Danh mục + Dòng máy + Khoảng giá + Sắp xếp + Tìm kiếm)
+    public function locmathang($danhmuc_id = null, $dongmay = null, $mucgia = null, $sort = null, $tukhoa = null){
+        $dbcon = DATABASE::connect();
+        try {
+            $sql = "SELECT * FROM mathang WHERE 1=1";
+            $params = [];
+
+            if(!empty($danhmuc_id) && $danhmuc_id > 0) {
+                $sql .= " AND danhmuc_id = :dmid";
+                $params[":dmid"] = $danhmuc_id;
+            }
+
+            if(!empty($dongmay)) {
+                $sql .= " AND (dongmay LIKE :dongmay OR tenmathang LIKE :dongmay)";
+                $params[":dongmay"] = "%" . $dongmay . "%";
+            }
+
+            if(!empty($tukhoa)) {
+                $sql .= " AND (tenmathang LIKE :tukhoa OR mota LIKE :tukhoa OR dongmay LIKE :tukhoa)";
+                $params[":tukhoa"] = "%" . $tukhoa . "%";
+            }
+
+            if(!empty($mucgia)) {
+                if($mucgia == "duoi_2tr") {
+                    $sql .= " AND giaban < 2000000";
+                } elseif($mucgia == "2tr_5tr") {
+                    $sql .= " AND giaban BETWEEN 2000000 AND 5000000";
+                } elseif($mucgia == "5tr_10tr") {
+                    $sql .= " AND giaban BETWEEN 5000000 AND 10000000";
+                } elseif($mucgia == "tren_10tr") {
+                    $sql .= " AND giaban > 10000000";
+                }
+            }
+
+            if($sort == "gia_tang") {
+                $sql .= " ORDER BY giaban ASC";
+            } elseif($sort == "gia_giam") {
+                $sql .= " ORDER BY giaban DESC";
+            } elseif($sort == "banchay") {
+                $sql .= " ORDER BY luotmua DESC, luotxem DESC";
+            } else {
+                $sql .= " ORDER BY id DESC";
+            }
+
+            $cmd = $dbcon->prepare($sql);
+            foreach($params as $key => $val) {
+                $cmd->bindValue($key, $val);
+            }
+            $cmd->execute();
+            return $cmd->fetchAll();
+        } catch(PDOException $e) {
+            $error_message = $e->getMessage();
+            echo "<p>Lỗi truy vấn: $error_message</p>";
+            exit();
+        }
+    }
+
 }
 ?>

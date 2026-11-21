@@ -1,0 +1,90 @@
+/**
+ * admin/assets/css/admin-custom.css
+ * XAG Store - Bổ trợ CSS cho Giao diện Quản trị Hiện đại Tailwind CSS
+ */
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Sidebar transition */
+#admin-sidebar {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Modal animation */
+.modal-overlay {
+    transition: opacity 0.25s ease-out;
+}
+.modal-container {
+    transition: transform 0.25s ease-out, opacity 0.25s ease-out;
+}
+.modal-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.modal-hidden .modal-container {
+    transform: scale(0.95);
+    opacity: 0;
+}
+
+/* Toast Notification Animation */
+.toast-item {
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateX(0);
+}
+.toast-item.hide {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+@keyframes toastProgress {
+    from {
+        width: 100%;
+    }
+    to {
+        width: 0%;
+    }
+}
+.toast-progress-bar {
+    animation: toastProgress 3.5s linear forwards;
+}
+
+/* Table styles */
+.table-hover-row:hover {
+    background-color: #f8fafc;
+}
+
+/* Badge glow pulse */
+.pulse-badge {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+    animation: pulseGlow 2s infinite;
+}
+@keyframes pulseGlow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 8px rgba(220, 38, 38, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+    }
+}
+
+/* Number font */
+.font-mono-num {
+    font-variant-numeric: tabular-nums;
+}

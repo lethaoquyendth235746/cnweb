@@ -8,7 +8,7 @@
 	
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 	
-	<title>Đăng nhập Quản trị - LPT DRONE</title>
+	<title>Đăng nhập Quản trị - XAG STORE</title>
 
 	<link href="../inc/css/app.css" rel="stylesheet">
 	<script src="../inc/js/app.js"></script>
@@ -23,28 +23,28 @@
 					<div class="d-table-cell align-middle">
 
 						<div class="text-center mt-4 mb-3">
-							<img src="../../images/logo.png" alt="LPT DRONE" class="img-fluid mb-2" style="max-height: 85px; border-radius: 10px; box-shadow: 0 4px 15px rgba(217, 4, 41, 0.3);">
-							<h1 class="h2 text-white fw-bold">LPT <span style="color: #D90429;">DRONE</span></h1>
+							<img src="../../images/logo.png" alt="XAG STORE" class="img-fluid mb-2" style="max-height: 85px; border-radius: 12px; box-shadow: 0 4px 20px rgba(220, 38, 38, 0.35);">
+							<h1 class="h2 text-white fw-bold">XAG <span style="color: #EA580C;">STORE</span></h1>
 							<p class="text-secondary">
-								Cổng Quản Trị Hệ Thống Linh Kiện XAG
+								Cổng Quản Trị Hệ Thống Linh Kiện Drone XAG
 							</p>
 						</div>
 
-						<div class="card shadow-lg" style="border-radius: 14px; border: 1px solid rgba(255,255,255,0.1);">
+						<div class="card shadow-lg" style="border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); background: #181A1D;">
 							<div class="card-body">
 								<div class="m-sm-3">
 									<form action="index.php" method="post">
 										<div class="mb-3">
-											<label class="form-label fw-semibold">Email Quản trị viên</label>
-											<input class="form-control form-control-lg" type="email" name="txtemail" placeholder="admin@xag.vn" required />
+											<label class="form-label text-light fw-semibold">Email Quản trị viên</label>
+											<input class="form-control form-control-lg" type="email" name="txtemail" placeholder="admin@xag.vn" required style="border-radius: 10px; background: #22252A; border: 1px solid #333842; color: #fff;" />
 										</div>
 										<div class="mb-3">
-											<label class="form-label fw-semibold">Mật khẩu</label>
-											<input class="form-control form-control-lg" type="password" name="txtmatkhau" placeholder="Nhập mật khẩu" required />
+											<label class="form-label text-light fw-semibold">Mật khẩu</label>
+											<input class="form-control form-control-lg" type="password" name="txtmatkhau" placeholder="Nhập mật khẩu" required style="border-radius: 10px; background: #22252A; border: 1px solid #333842; color: #fff;" />
 										</div>
 										<div class="d-grid gap-2 my-3">
 											<input type="hidden" name="action" value="xldangnhap">
-											<button type="submit" class="btn btn-lg fw-bold text-white" style="background-color: #D90429; border: none;">Đăng nhập hệ thống</button>
+											<button type="submit" class="btn btn-lg fw-bold text-white shadow-sm" style="background: linear-gradient(135deg, #DC2626 0%, #EA580C 100%); border: none; border-radius: 10px;">Đăng nhập hệ thống</button>
 										</div>
 									</form>
 								</div>

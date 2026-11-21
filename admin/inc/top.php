@@ -11,6 +11,7 @@
 	<title>Trang quản trị - LPT DRONE</title>
 
 	<link href="../inc/css/app.css" rel="stylesheet">
+    <link href="../css/admin-style.css" rel="stylesheet">
 	<script src="../inc/js/app.js"></script>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 	<script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/ckeditor.js"></script>
@@ -22,6 +23,7 @@
 			<div class="sidebar-content js-simplebar">
 				<a class="sidebar-brand" href="">
           <span class="align-middle">LPT DRONE</span>
+        <div class="sidebar-panel text-white text-center mt-2" style="font-size:0.9rem;">ADMIN PANEL</div>
         </a>
 
 				<ul class="sidebar-nav">

@@ -27,39 +27,52 @@ else{
 
 switch($action){
     case "null": 	
-    	$mathang = $mh->laymathang();	
+        $madm = isset($_GET["id"]) ? (int)$_GET["id"] : null;
+        $model = isset($_GET["model"]) ? trim($_GET["model"]) : null;
+        $mucgia = isset($_GET["mucgia"]) ? trim($_GET["mucgia"]) : null;
+        $sort = isset($_GET["sort"]) ? trim($_GET["sort"]) : null;
+        $tukhoa = isset($_GET["tukhoa"]) ? trim($_GET["tukhoa"]) : null;
+
+        if($madm || $model || $mucgia || $sort || $tukhoa){
+            $mathang = $mh->locmathang($madm, $model, $mucgia, $sort, $tukhoa);
+        } else {
+            $mathang = $mh->laymathang();
+        }
         include("main.php");
         break;
     case "group": 
-        if(isset($_REQUEST["id"])){
-            $madm = $_REQUEST["id"];
+        $madm = isset($_REQUEST["id"]) ? (int)$_REQUEST["id"] : null;
+        $model = isset($_REQUEST["model"]) ? trim($_REQUEST["model"]) : null;
+        $mucgia = isset($_REQUEST["mucgia"]) ? trim($_REQUEST["mucgia"]) : null;
+        $sort = isset($_REQUEST["sort"]) ? trim($_REQUEST["sort"]) : null;
+        $tukhoa = isset($_REQUEST["tukhoa"]) ? trim($_REQUEST["tukhoa"]) : null;
+
+        if($madm){
             $dmuc = $dm->laydanhmuctheoid($madm);
-            $tendm =  $dmuc["tendanhmuc"];   
-            $sort = isset($_REQUEST["sort"]) ? $_REQUEST["sort"] : null;
-            $mathang = $mh->laymathangtheodanhmucvasapxep($madm, $sort);
-            include("group.php");
+            $tendm = ($dmuc && isset($dmuc["tendanhmuc"])) ? $dmuc["tendanhmuc"] : "Linh kiện Drone XAG";
+        } else {
+            $tendm = "Tất cả linh kiện Drone XAG";
         }
-        else{
-            include("main.php");
-        }
+        $mathang = $mh->locmathang($madm, $model, $mucgia, $sort, $tukhoa);
+        include("group.php");
         break;
     case "dongmay": 
-        if(isset($_REQUEST["model"])){
-            $model = trim($_REQUEST["model"]);
-            $tendm = "Linh kiện tương thích dòng: XAG " . htmlspecialchars($model);
-            $sort = isset($_REQUEST["sort"]) ? $_REQUEST["sort"] : null;
-            $mathang = $mh->laymathangtheodongmay($model, $sort);
-            include("group.php");
-        }
-        else{
-            include("main.php");
-        }
+        $model = isset($_REQUEST["model"]) ? trim($_REQUEST["model"]) : "";
+        $madm = isset($_REQUEST["id"]) ? (int)$_REQUEST["id"] : null;
+        $mucgia = isset($_REQUEST["mucgia"]) ? trim($_REQUEST["mucgia"]) : null;
+        $sort = isset($_REQUEST["sort"]) ? trim($_REQUEST["sort"]) : null;
+        $tendm = "Linh kiện tương thích dòng: XAG " . htmlspecialchars($model);
+        $mathang = $mh->locmathang($madm, $model, $mucgia, $sort, null);
+        include("group.php");
         break;
     case "search": 
         $tukhoa = isset($_REQUEST["tukhoa"]) ? trim($_REQUEST["tukhoa"]) : "";
-        $tendm = "Kết quả tìm kiếm cho: \"" . htmlspecialchars($tukhoa) . "\"";
-        $sort = isset($_REQUEST["sort"]) ? $_REQUEST["sort"] : null;
-        $mathang = $mh->timkiemmathang($tukhoa, $sort);
+        $madm = isset($_REQUEST["id"]) ? (int)$_REQUEST["id"] : null;
+        $model = isset($_REQUEST["model"]) ? trim($_REQUEST["model"]) : null;
+        $mucgia = isset($_REQUEST["mucgia"]) ? trim($_REQUEST["mucgia"]) : null;
+        $sort = isset($_REQUEST["sort"]) ? trim($_REQUEST["sort"]) : null;
+        $tendm = "Kết quả tìm kiếm: \"" . htmlspecialchars($tukhoa) . "\"";
+        $mathang = $mh->locmathang($madm, $model, $mucgia, $sort, $tukhoa);
         include("group.php");
         break;
     case "gioithieu":

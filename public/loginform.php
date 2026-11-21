@@ -2,48 +2,53 @@
 include("inc/top.php");
 ?>
 
-<div class="row justify-content-center my-5">
-    <div class="col-md-6 col-lg-5">
-        <div class="bg-white p-4 p-md-5 rounded-4 shadow-sm border">
-            <div class="text-center mb-4">
-                <img src="../images/logo.png" alt="LPT DRONE" class="img-fluid mb-2" style="max-height: 70px; border-radius: 8px;">
-                <h3 class="fw-bold text-dark">ĐĂNG NHẬP THÀNH VIÊN</h3>
-                <p class="text-muted small">Quản lý lịch sử mua linh kiện và theo dõi đơn hàng XAG</p>
-            </div>
+<!-- Breadcrumb -->
+<section class="py-3 bg-light border-bottom mb-4">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="collection-breadcrumb mb-0">
+            <a href="index.php"><i class="bi bi-house-door-fill"></i> Trang chủ</a>
+            <span class="mx-1">/</span>
+            <span class="text-dark fw-semibold">Đăng nhập tài khoản</span>
+        </nav>
+    </div>
+</section>
 
-            <form method="post" action="index.php">
-                <input type="hidden" name="action" value="xldangnhap">
-
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Địa chỉ Email đăng nhập:</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
-                        <input class="form-control" type="email" name="txtemail" placeholder="Ví dụ: khachhang@xag.vn" required>
-                    </div>
+<div class="container mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="bg-white p-4 p-md-5 rounded border">
+                <div class="text-center mb-4">
+                    <img src="../images/logo.png" alt="LPT DRONE" class="img-fluid mb-2" style="max-height: 55px; border-radius: 6px;">
+                    <h1 class="h5 fw-bold text-dark text-uppercase mb-1">Đăng nhập tài khoản</h1>
+                    <p class="text-muted small">Theo dõi đơn đặt hàng linh kiện XAG của bạn</p>
                 </div>
 
-                <div class="mb-4">
-                    <label class="form-label fw-semibold">Mật khẩu:</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                <form method="post" action="index.php">
+                    <input type="hidden" name="action" value="xldangnhap">
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-secondary">Địa chỉ Email:</label>
+                        <input class="form-control" type="email" name="txtemail" placeholder="khachhang@xag.vn" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold text-secondary">Mật khẩu:</label>
                         <input class="form-control" type="password" name="txtmatkhau" placeholder="Nhập mật khẩu" required>
                     </div>
-                </div>
 
-                <div class="d-grid mb-3">
-                    <button class="btn btn-danger btn-lg fw-bold py-2" type="submit">
-                        <i class="bi bi-box-arrow-in-right me-1"></i> Đăng nhập ngay
+                    <button class="btn btn-danger w-100 fw-bold py-2 mb-3 text-uppercase" type="submit">
+                        Đăng nhập
                     </button>
+                </form>
+
+                <div class="p-3 bg-light rounded small text-secondary mb-3">
+                    <div class="fw-bold text-dark mb-1">Tài khoản khách hàng thử nghiệm:</div>
+                    Email: <code>khachhang@xag.vn</code> | Pass: <code>123456</code>
                 </div>
-            </form>
 
-            <div class="p-3 bg-light rounded-3 small text-muted mb-3">
-                <strong>Tài khoản khách hàng mẫu thử nghiệm:</strong><br>
-                Email: <code>khachhang@xag.vn</code> | Pass: <code>123456</code>
-            </div>
-
-            <div class="text-center small text-muted">
-                <span>Chưa có tài khoản? Khi đặt hàng tại trang Thanh toán, hệ thống sẽ tự động tạo thông tin cho quý khách.</span>
+                <div class="text-center small text-muted">
+                    <a href="index.php" class="text-secondary">&larr; Quay lại cửa hàng</a>
+                </div>
             </div>
         </div>
     </div>
