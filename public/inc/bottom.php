@@ -1,10 +1,10 @@
     <!-- FLOATING HOTLINE PILL -->
-    <a href="tel:0833609329" class="floating-hotline-pill text-decoration-none shadow" title="Gọi Hotline kỹ thuật">
+    <a href="tel:0833609329" class="floating-hotline-pill text-decoration-none shadow" title="Gọi Hotline kỹ thuật LPT DRONE">
         <i class="bi bi-telephone-inbound-fill"></i>
-        <span>083 609 3229</span>
+        <span>0833 609 329</span>
     </a>
 
-    <!-- SITE FOOTER (DARK CARBON #111315 VỚI ĐIỂM NHẤN ĐỎ) -->
+    <!-- SITE FOOTER (DARK CARBON #18181B VỚI ĐIỂM NHẤN ĐỎ TRẦM #B91C1C) -->
     <footer class="site-footer">
         <div class="container">
             <div class="row g-4 pb-4">
@@ -21,34 +21,38 @@
                         Hệ thống cung cấp phụ tùng, sản phẩm máy bay nông nghiệp XAG chính hãng chuyên nghiệp. Sẵn sàng đồng hành cùng phi công và các trạm dịch vụ trong từng mùa vụ.
                     </p>
                     <div class="small text-secondary">
-                        <div><i class="bi bi-check2-circle text-danger me-1"></i> Linh kiện chuẩn xuất xưởng 100%</div>
+                        <div class="mb-1"><i class="bi bi-check2-circle text-danger me-1"></i> Linh kiện chuẩn xuất xưởng 100%</div>
                         <div><i class="bi bi-truck text-danger me-1"></i> Gửi xe khách, chành xe hỏa tốc trong 24h</div>
                     </div>
                 </div>
 
-                <!-- Cột 2: Danh mục sản phẩm -->
+                <!-- Cột 2: Danh mục sản phẩm (Động) -->
                 <div class="col-6 col-md-3 col-lg-2">
-                    <h6 class="footer-heading">DANH MỤC SẢN PHẨM</h6>
+                    <h6 class="footer-heading">DANH MỤC LINH KIỆN</h6>
                     <ul class="footer-links-list">
-                        <li><a href="index.php?action=group&id=1">Động cơ (Motor)</a></li>
-                        <li><a href="index.php?action=group&id=2">Cánh quạt</a></li>
-                        <li><a href="index.php?action=group&id=3">Pin thông minh</a></li>
-                        <li><a href="index.php?action=group&id=4">Bơm nhu động</a></li>
-                        <li><a href="index.php?action=group&id=5">Vòi phun ly tâm</a></li>
-                        <li><a href="index.php?action=group&id=6">Mạch FC / ESC</a></li>
-                        <li><a href="index.php?action=group&id=7">Khung sườn & Càng</a></li>
+                        <?php if(isset($danhmuc) && is_array($danhmuc)): ?>
+                            <?php foreach ($danhmuc as $d): ?>
+                            <li><a href="index.php?action=group&id=<?php echo $d["id"]; ?>"><?php echo htmlspecialchars($d["tendanhmuc"]); ?></a></li>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <li><a href="index.php?action=group&id=1">Động cơ (Motor)</a></li>
+                            <li><a href="index.php?action=group&id=2">Cánh quạt</a></li>
+                            <li><a href="index.php?action=group&id=3">Pin thông minh</a></li>
+                            <li><a href="index.php?action=group&id=4">Bơm nhu động</a></li>
+                            <li><a href="index.php?action=group&id=5">Vòi phun ly tâm</a></li>
+                        <?php endif; ?>
                     </ul>
                 </div>
 
                 <!-- Cột 3: Hỗ trợ khách hàng -->
                 <div class="col-6 col-md-3 col-lg-3">
-                    <h6 class="footer-heading">HỖ TRỢ KHÁCH HÀNG</h6>
+                    <h6 class="footer-heading">THÔNG TIN & HỖ TRỢ</h6>
                     <ul class="footer-links-list">
+                        <li><a href="index.php?action=gioithieu">Về chúng tôi (LPT DRONE)</a></li>
+                        <li><a href="index.php?action=group">Tất cả sản phẩm & Phụ tùng</a></li>
+                        <li><a href="index.php?action=lienhe">Liên hệ trạm kỹ thuật</a></li>
                         <li><a href="#">Chính sách bảo hành 1 đổi 1</a></li>
                         <li><a href="#">Quy định kiểm tra hàng khi nhận (COD)</a></li>
-                        <li><a href="#">Phương thức giao hàng & gửi chành xe</a></li>
-                        <li><a href="#">Tư vấn chuẩn đoán lỗi máy bay từ xa</a></li>
-                        <li><a href="#">Chính sách bảo mật thông tin</a></li>
                     </ul>
                 </div>
 
@@ -61,7 +65,7 @@
                     </div>
                     <div class="small text-secondary mb-2">
                         <span class="text-white fw-bold d-block">Kho hàng & Trạm bảo dưỡng:</span>
-                        QL91, TT. Cái Dầu, Châu Thành , Tỉnh An Giang
+                        QL91, TT. Cái Dầu, Châu Phú, Tỉnh An Giang
                     </div>
                     <div class="small text-secondary mb-2">
                         <span class="text-white fw-bold d-block">Thời gian phục vụ:</span>

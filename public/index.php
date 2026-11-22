@@ -1,9 +1,10 @@
 <?php 
 if (session_status() == PHP_SESSION_NONE) {
- session_start();
+    session_start();
 }
 require("../model/database.php");
 require("../model/danhmuc.php");
+require("../model/dongmay.php");
 require("../model/mathang.php");
 require("../model/giohang.php");
 require("../model/khachhang.php");
@@ -11,9 +12,12 @@ require("../model/diachi.php");
 require("../model/donhang.php");
 require("../model/donhangct.php");
 
-
 $dm = new DANHMUC();
 $danhmuc = $dm->laydanhmuc();
+
+$dmay = new DONGMAY();
+$dongmay_list = $dmay->laydongmay();
+
 $mh = new MATHANG();
 $mathangxemnhieu = $mh->laymathangxemnhieu();
 
@@ -24,23 +28,16 @@ else{
     $action="null"; 
 }
 
-
 switch($action){
     case "null": 	
-        $madm = isset($_GET["id"]) ? (int)$_GET["id"] : null;
-        $model = isset($_GET["model"]) ? trim($_GET["model"]) : null;
-        $mucgia = isset($_GET["mucgia"]) ? trim($_GET["mucgia"]) : null;
-        $sort = isset($_GET["sort"]) ? trim($_GET["sort"]) : null;
-        $tukhoa = isset($_GET["tukhoa"]) ? trim($_GET["tukhoa"]) : null;
-
-        if($madm || $model || $mucgia || $sort || $tukhoa){
-            $mathang = $mh->locmathang($madm, $model, $mucgia, $sort, $tukhoa);
-        } else {
-            $mathang = $mh->laymathang();
-        }
+        // Trang chủ LPT DRONE theo bố cục Giới thiệu + Danh mục tuần phần (Không hiện bộ lọc)
         include("main.php");
         break;
+
+    case "tatcasanpham":
     case "group": 
+    case "dongmay": 
+    case "search":
         $madm = isset($_REQUEST["id"]) ? (int)$_REQUEST["id"] : null;
         $model = isset($_REQUEST["model"]) ? trim($_REQUEST["model"]) : null;
         $mucgia = isset($_REQUEST["mucgia"]) ? trim($_REQUEST["mucgia"]) : null;
@@ -50,79 +47,78 @@ switch($action){
         if($madm){
             $dmuc = $dm->laydanhmuctheoid($madm);
             $tendm = ($dmuc && isset($dmuc["tendanhmuc"])) ? $dmuc["tendanhmuc"] : "Linh kiện Drone XAG";
+        } elseif(!empty($model)) {
+            $tendm = "Linh kiện tương thích dòng: XAG " . htmlspecialchars($model);
+        } elseif(!empty($tukhoa)) {
+            $tendm = "Kết quả tìm kiếm: \"" . htmlspecialchars($tukhoa) . "\"";
         } else {
-            $tendm = "Tất cả linh kiện Drone XAG";
+            $tendm = "Tất cả sản phẩm & Phụ tùng Drone XAG";
         }
-        $mathang = $mh->locmathang($madm, $model, $mucgia, $sort, $tukhoa);
+
+        // Xử lý Phân trang (Pagination) 9 sản phẩm / trang
+        $limit = 9;
+        $trang = isset($_GET["trang"]) ? max(1, (int)$_GET["trang"]) : 1;
+        $tongsomathang = $mh->demlocmathang($madm, $model, $mucgia, $tukhoa);
+        $tongsotrang = ceil($tongsomathang / $limit);
+        if($tongsotrang < 1) $tongsotrang = 1;
+        if($trang > $tongsotrang) $trang = $tongsotrang;
+        $offset = ($trang - 1) * $limit;
+
+        $mathang = $mh->locmathangphantrang($madm, $model, $mucgia, $sort, $tukhoa, $offset, $limit);
         include("group.php");
         break;
-    case "dongmay": 
-        $model = isset($_REQUEST["model"]) ? trim($_REQUEST["model"]) : "";
-        $madm = isset($_REQUEST["id"]) ? (int)$_REQUEST["id"] : null;
-        $mucgia = isset($_REQUEST["mucgia"]) ? trim($_REQUEST["mucgia"]) : null;
-        $sort = isset($_REQUEST["sort"]) ? trim($_REQUEST["sort"]) : null;
-        $tendm = "Linh kiện tương thích dòng: XAG " . htmlspecialchars($model);
-        $mathang = $mh->locmathang($madm, $model, $mucgia, $sort, null);
-        include("group.php");
-        break;
-    case "search": 
-        $tukhoa = isset($_REQUEST["tukhoa"]) ? trim($_REQUEST["tukhoa"]) : "";
-        $madm = isset($_REQUEST["id"]) ? (int)$_REQUEST["id"] : null;
-        $model = isset($_REQUEST["model"]) ? trim($_REQUEST["model"]) : null;
-        $mucgia = isset($_REQUEST["mucgia"]) ? trim($_REQUEST["mucgia"]) : null;
-        $sort = isset($_REQUEST["sort"]) ? trim($_REQUEST["sort"]) : null;
-        $tendm = "Kết quả tìm kiếm: \"" . htmlspecialchars($tukhoa) . "\"";
-        $mathang = $mh->locmathang($madm, $model, $mucgia, $sort, $tukhoa);
-        include("group.php");
-        break;
+
     case "gioithieu":
         include("gioithieu.php");
         break;
+
     case "lienhe":
         include("lienhe.php");
         break;
+
     case "detail": 
         if(isset($_GET["id"])){
             $mahang = $_GET["id"];
-            // tăng lượt xem lên 1
+            // Tăng lượt xem lên 1
             $mh->tangluotxem($mahang);
-            // lấy thông tin chi tiết mặt hàng
+            // Lấy thông tin chi tiết mặt hàng
             $mhct = $mh->laymathangtheoid($mahang);
-            // lấy các mặt hàng cùng danh mục
+            // Lấy các mặt hàng cùng danh mục
             $madm = $mhct["danhmuc_id"];
             $mathang = $mh->laymathangtheodanhmuc($madm);
             include("detail.php");
         }
         break;
-    case "chovaogio":    
-        if(isset($_REQUEST["id"]))
-            $id = $_REQUEST["id"];
-        if(isset($_REQUEST["soluong"]))
-            $soluong = $_REQUEST["soluong"];
-        else
-            $soluong = 1;
 
-        if(isset($_SESSION['giohang'][$id])){ // nếu đã có trong giỏ thì tăng số lượng
-            $soluong += $_SESSION['giohang'][$id];
-            $_SESSION['giohang'][$id] = $soluong;
-        }
-        else{       // nếu chưa thì thêm vào giỏ
-            themhangvaogio($id, $soluong);
+    case "chovaogio":    
+        $id = isset($_REQUEST["id"]) ? $_REQUEST["id"] : null;
+        $soluong = isset($_REQUEST["soluong"]) ? (int)$_REQUEST["soluong"] : 1;
+        if($soluong < 1) $soluong = 1;
+
+        if($id){
+            if(isset($_SESSION['giohang'][$id])){
+                $_SESSION['giohang'][$id] += $soluong;
+            }
+            else{
+                themhangvaogio($id, $soluong);
+            }
         }
         
         $giohang = laygiohang();   
         include("cart.php");
         break;
+
     case "giohang":  
         $giohang = laygiohang();   
         include("cart.php");
         break;
+
     case "capnhatgio":
         if(isset($_REQUEST["mh"])){
-            $mh = $_REQUEST["mh"];
-            foreach ($mh as $id => $soluong) {
-                if($soluong > 0)
-                    capnhatsoluong($id, $soluong);
+            $mh_post = $_REQUEST["mh"];
+            foreach ($mh_post as $id => $soluong) {
+                if((int)$soluong > 0)
+                    capnhatsoluong($id, (int)$soluong);
                 else 
                     xoamotmathang($id);                
             }
@@ -130,98 +126,141 @@ switch($action){
         $giohang = laygiohang();   
         include("cart.php");
         break;
+
     case "xoagiohang":  
         xoagiohang();
         $giohang = laygiohang();   
         include("cart.php");
         break;
+
     case "thanhtoan":        
         $giohang = laygiohang();
-        if(isset($_SESSION["khachhang"])){ // lay dia chi khach hang
+        if(empty($giohang)){
+            header("Location: index.php?action=giohang");
+            exit();
+        }
+        if(isset($_SESSION["khachhang"])){
             $dc = new DIACHI();
             $diachi = $dc->laydiachikhachhang($_SESSION["khachhang"]["id"]);
         }
         include("checkout.php");
         break;
+
     case "luudonhang": 
-        
-        $diachi = $_POST["txtdiachi"];
-        if(!isset($_SESSION["khachhang"])){ // khách chưa đăng nhập
-            $email = $_POST["txtemail"];
-            $hoten = $_POST["txthoten"];
-            $sodienthoai = $_POST["txtsodienthoai"];
+        $giohang = laygiohang();
+        if(empty($giohang)){
+            header("Location: index.php?action=giohang");
+            exit();
+        }
+
+        $diachi = isset($_POST["txtdiachi"]) ? trim($_POST["txtdiachi"]) : "";
+        if(empty($diachi)){
+            $tb_loi = "Vui lòng nhập địa chỉ nhận hàng hoặc thông tin nhà xe gửi hàng!";
+            include("checkout.php");
+            break;
+        }
+
+        if(!isset($_SESSION["khachhang"])){ // Khách vãng lai (chưa đăng nhập)
+            $email = trim($_POST["txtemail"] ?? "");
+            $hoten = trim($_POST["txthoten"] ?? "");
+            $sodienthoai = trim($_POST["txtsodienthoai"] ?? "");
             
-            // lưu thông tin khách nếu chưa có trong db (kiểm tra email có tồn tại chưa)
-            // xử lý thêm...
+            if(empty($email) || empty($hoten) || empty($sodienthoai)){
+                $tb_loi = "Vui lòng điền đầy đủ họ tên, số điện thoại và email nhận thông báo!";
+                include("checkout.php");
+                break;
+            }
+
             $kh = new KHACHHANG();
-            if($kh->laythongtinkhachhang($email) == null){
-            $khachhang_id = $kh->themkhachhang($email,$sodienthoai,$hoten);
-            // lưu địa chỉ giao hàng 
-            // cần xử lý địa chỉ cho 2 trường hợp if... else
-            $dc = new DIACHI();
-            $diachi_id = $dc->themdiachi($khachhang_id,$diachi);
+            $existing_kh = $kh->laythongtinkhachhang($email);
+            if($existing_kh == null){
+                $khachhang_id = $kh->themkhachhang($email, $sodienthoai, $hoten);
+                $dc = new DIACHI();
+                $diachi_id = $dc->themdiachi($khachhang_id, $diachi);
             }
             else{
-                $khachhang = $kh->laythongtinkhachhang($email);
-                $khachhang_id = $khachhang["id"];
+                $khachhang_id = $existing_kh["id"];
                 $dc = new DIACHI();
-                $diachi = $dc->laydiachikhachhang($khachhang_id);            
-                $diachi_id = $diachi["id"];
+                $diachi_rec = $dc->laydiachikhachhang($khachhang_id);
+                if($diachi_rec && isset($diachi_rec["id"])){
+                    $diachi_id = $diachi_rec["id"];
+                } else {
+                    $diachi_id = $dc->themdiachi($khachhang_id, $diachi);
+                }
             }            
         }
-        else{ // khách đã đăng nhập
+        else{ // Khách đã đăng nhập
             $khachhang_id = $_SESSION["khachhang"]["id"];           
             $hoten = $_SESSION["khachhang"]["hoten"];
             $dc = new DIACHI();
-            $diachi = $dc->laydiachikhachhang($khachhang_id);            
-            $diachi_id = $diachi["id"];
+            $diachi_rec = $dc->laydiachikhachhang($khachhang_id);
+            if($diachi_rec && isset($diachi_rec["id"])){
+                $diachi_id = $diachi_rec["id"];
+            } else {
+                $diachi_id = $dc->themdiachi($khachhang_id, $diachi);
+            }
         }
         
-        // lưu đơn hàng
+        // Đặt hàng an toàn bằng Transaction & Kiểm tra đủ tồn kho
         $dh = new DONHANG();
         $tongtien = tinhtiengiohang();
-        $donhang_id = $dh->themdonhang($khachhang_id,$diachi_id,$tongtien);
+        $result = $dh->datHangAnToan($khachhang_id, $diachi_id, $tongtien, $giohang);
         
-        // lưu chi tiết đơn hàng
-        $ct = new DONHANGCT();      
-        $giohang = laygiohang();
-        foreach($giohang as $id => $mh){
-            $dongia = $mh["giaban"];
-            $soluong = $mh["soluong"];
-            $thanhtien = $mh["thanhtien"];
-            $ct->themchitietdonhang($donhang_id,$id,$dongia,$soluong,$thanhtien);
-            $mh = new MATHANG();
-            $mh->capnhatsoluong($id, $soluong);
+        if($result['success']){
+            $donhang_id = $result['donhang_id'];
+            // Xóa giỏ hàng
+            xoagiohang();
+            // Chuyển đến trang cảm ơn
+            include("message.php");
+        } else {
+            $tb_loi = $result['message'];
+            include("checkout.php");
         }
-        
-        // xóa giỏ hàng
-        xoagiohang();
-        
-        // chuyển đến trang cảm ơn
-        include("message.php");
         break;
+
+    case "huydonhang":
+        if(isset($_SESSION["khachhang"]) && isset($_POST["donhang_id"])){
+            $dh_id = (int)$_POST["donhang_id"];
+            $kh_id = (int)$_SESSION["khachhang"]["id"];
+            $dh = new DONHANG();
+            $res = $dh->huyDonHangKhachHang($dh_id, $kh_id);
+            if($res['success']){
+                $_SESSION['flash_msg'] = [
+                    'type' => 'success', 
+                    'text' => $res['message']
+                ];
+            } else {
+                $_SESSION['flash_msg'] = [
+                    'type' => 'danger', 
+                    'text' => $res['message']
+                ];
+            }
+        }
+        header("Location: index.php?action=thongtin");
+        exit();
+        break;
+
     case "dangnhap":
         include("loginform.php");
         break;
+
     case "xldangnhap":
-        $email = $_POST["txtemail"];
-        $matkhau = $_POST["txtmatkhau"];
+        $email = trim($_POST["txtemail"] ?? "");
+        $matkhau = trim($_POST["txtmatkhau"] ?? "");
         $kh = new KHACHHANG();
-        if($kh->kiemtrakhachhanghople($email,$matkhau)==TRUE){
+        if($kh->kiemtrakhachhanghople($email, $matkhau) == TRUE){
             $_SESSION["khachhang"] = $kh->laythongtinkhachhang($email);
-            // đọc thông tin (đơn hàng) của kh
             $dh = new DONHANG();
             $donhang = $dh->laydanhsachdonhangtheokh($_SESSION["khachhang"]["id"]);
             include("info.php");
         }
         else{
-            //$tb = "Đăng nhập không thành công!";
             include("loginform.php");
         }
         break;
+
     case "thongtin":
         if(isset($_SESSION["khachhang"])){
-            // đọc thông tin các đơn của khách
             $dh = new DONHANG();
             $donhang = $dh->laydanhsachdonhangtheokh($_SESSION["khachhang"]["id"]);
             
@@ -230,30 +269,17 @@ switch($action){
                 $donhangct = $dhct->laychitietdonhang($_REQUEST["dhid"]);
             }
         }
-        include("info.php"); // trang info.php hiển thị các đơn đã đặt
+        include("info.php");
         break;
+
     case "dangxuat":
         unset($_SESSION["khachhang"]);
-        // chuyển về trang chủ
-/*        // xử lý phân trang
-        $tongmh = $mh->demtongsomathang();   // tổng số mặt hàng
-        $soluong = 4;                           // số lượng mh hiển thị trên trang 
-        $tongsotrang = ceil($tongmh/$soluong);  // tổng số trang
-        if(!isset($_REQUEST["trang"]))          // trang hiện hành: mặc định là trang đầu
-            $tranghh = 1;   
-        else                                    // hoặc hiển thị trang do người dùng chọn
-            $tranghh = $_REQUEST["trang"];
-        if($tranghh > $tongsotrang)
-            $tranghh = $tongsotrang;
-        else if($tranghh < 1)
-            $tranghh = 1;
-        $batdau = ($tranghh-1)*$soluong;          // mặt hàng bắt đầu sẽ lấy
-        $mathang = $mh->laymathangphantrang($batdau, $soluong);
-*/
-        $mathang = $mh->laymathang();   
-        include("main.php");
+        header("Location: index.php");
+        exit();
         break;    
+
     default:
+        include("main.php");
         break;
 }
 ?>

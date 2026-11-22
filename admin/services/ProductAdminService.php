@@ -22,9 +22,17 @@ class ProductAdminService {
     ];
 
     /**
-     * Lấy danh sách các dòng máy bay XAG
+     * Lấy danh sách tên các dòng máy bay XAG (chuỗi tên phục vụ tương thích)
      */
     public function getDroneModels(): array {
+        try {
+            $all = $this->getAllDongMay();
+            if (!empty($all)) {
+                return array_column($all, 'tendongmay');
+            }
+        } catch (Throwable $e) {
+            // fallback nếu chưa nạp schema
+        }
         return self::SUPPORTED_DRONE_MODELS;
     }
 
@@ -397,5 +405,146 @@ class ProductAdminService {
 
         // Trả về đường dẫn tương đối nhất quán với DB hiện hành
         return 'images/products/' . $filename;
+    }
+
+    // =========================================================================
+    // QUẢN LÝ DÒNG MÁY TƯƠNG THÍCH (DONGMAY) - CRUD ĐỘNG
+    // =========================================================================
+
+    /**
+     * Lấy danh sách tất cả dòng máy từ bảng dongmay kèm số lượng linh kiện đang liên kết
+     *
+     * @return array [ ['id' => int, 'tendongmay' => string, 'tong_san_pham' => int], ... ]
+     */
+    public function getAllDongMay(): array {
+        $pdo = DatabaseService::pdo();
+        $sql = "SELECT dm.id, dm.tendongmay, COUNT(m.id) AS tong_san_pham
+                FROM dongmay dm
+                LEFT JOIN mathang m ON (m.dongmay = dm.tendongmay)
+                GROUP BY dm.id, dm.tendongmay
+                ORDER BY dm.tendongmay ASC";
+        $stmt = $pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Lấy thông tin một dòng máy theo ID
+     */
+    public function getDongMayById(int $id): ?array {
+        $pdo = DatabaseService::pdo();
+        $stmt = $pdo->prepare("SELECT * FROM dongmay WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        $res = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $res ?: null;
+    }
+
+    /**
+     * Thêm dòng máy Drone mới
+     *
+     * @throws InvalidArgumentException
+     */
+    public function addDongMay(string $tenDongMay): int {
+        $name = trim($tenDongMay);
+        if ($name === '') {
+            throw new InvalidArgumentException("Tên dòng máy không được để trống.");
+        }
+
+        if (mb_strlen($name) > 100) {
+            throw new InvalidArgumentException("Tên dòng máy không được vượt quá 100 ký tự.");
+        }
+
+        $pdo = DatabaseService::pdo();
+        // Kiểm tra trùng tên không phân biệt hoa thường
+        $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM dongmay WHERE LOWER(tendongmay) = LOWER(:name)");
+        $stmtCheck->execute([':name' => $name]);
+        if ((int)$stmtCheck->fetchColumn() > 0) {
+            throw new InvalidArgumentException("Dòng máy '{$name}' đã tồn tại trong hệ thống.");
+        }
+
+        $stmt = $pdo->prepare("INSERT INTO dongmay (tendongmay) VALUES (:name)");
+        $stmt->execute([':name' => $name]);
+
+        return (int)$pdo->lastInsertId();
+    }
+
+    /**
+     * Đổi tên dòng máy và đồng bộ sang cột dongmay của bảng mathang trong cùng Transaction
+     *
+     * @throws InvalidArgumentException|RuntimeException
+     */
+    public function updateDongMay(int $id, string $tenMoi): bool {
+        $name = trim($tenMoi);
+        if ($name === '') {
+            throw new InvalidArgumentException("Tên dòng máy mới không được để trống.");
+        }
+
+        $pdo = DatabaseService::pdo();
+
+        $cur = $this->getDongMayById($id);
+        if (!$cur) {
+            throw new InvalidArgumentException("Dòng máy #{$id} không tồn tại.");
+        }
+
+        $oldName = $cur['tendongmay'];
+        if ($oldName === $name) {
+            return true;
+        }
+
+        // Kiểm tra tên mới có bị trùng dòng máy khác không
+        $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM dongmay WHERE LOWER(tendongmay) = LOWER(:name) AND id != :id");
+        $stmtCheck->execute([':name' => $name, ':id' => $id]);
+        if ((int)$stmtCheck->fetchColumn() > 0) {
+            throw new InvalidArgumentException("Dòng máy '{$name}' đã tồn tại.");
+        }
+
+        DatabaseService::beginTransaction();
+        try {
+            // 1. Cập nhật bảng dongmay
+            $stmt1 = $pdo->prepare("UPDATE dongmay SET tendongmay = :name WHERE id = :id");
+            $stmt1->execute([':name' => $name, ':id' => $id]);
+
+            // 2. Đồng bộ các mặt hàng đang dùng chuỗi tên cũ
+            $stmt2 = $pdo->prepare("UPDATE mathang SET dongmay = :newName WHERE dongmay = :oldName");
+            $stmt2->execute([':newName' => $name, ':oldName' => $oldName]);
+
+            DatabaseService::commit();
+            return true;
+        } catch (Throwable $e) {
+            DatabaseService::rollBack();
+            throw new RuntimeException("Lỗi cập nhật dòng máy: " . $e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * Xóa dòng máy. Tự động gỡ nhãn dòng máy khỏi các linh kiện đang gắn (chuyển về NULL / Dùng chung)
+     *
+     * @throws InvalidArgumentException|RuntimeException
+     */
+    public function deleteDongMay(int $id): bool {
+        $pdo = DatabaseService::pdo();
+
+        $cur = $this->getDongMayById($id);
+        if (!$cur) {
+            throw new InvalidArgumentException("Dòng máy #{$id} không tồn tại.");
+        }
+
+        $name = $cur['tendongmay'];
+
+        DatabaseService::beginTransaction();
+        try {
+            // 1. Gỡ nhãn dòng máy ở bảng mathang
+            $stmt1 = $pdo->prepare("UPDATE mathang SET dongmay = NULL WHERE dongmay = :name");
+            $stmt1->execute([':name' => $name]);
+
+            // 2. Xóa khỏi bảng dongmay
+            $stmt2 = $pdo->prepare("DELETE FROM dongmay WHERE id = :id");
+            $stmt2->execute([':id' => $id]);
+
+            DatabaseService::commit();
+            return true;
+        } catch (Throwable $e) {
+            DatabaseService::rollBack();
+            throw new RuntimeException("Lỗi xóa dòng máy: " . $e->getMessage(), 0, $e);
+        }
     }
 }

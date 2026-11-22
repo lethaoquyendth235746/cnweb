@@ -1,26 +1,27 @@
 /* ==========================================================================
    LPT DRONE - SHOPIFY INDUSTRIAL / TECH STOREFRONT THEME
-   Màu chủ đạo: Đỏ công nghệ (#D90429, hover #B00020)
-   Canvas: Nền sáng tối giản, viền mỏng sắc nét (#E5E7EB)
+   Màu chủ đạo: Đỏ trầm (#B91C1C / #DC2626) kết hợp Đen than chì (#18181B)
+   Canvas: Nền sáng tối giản, viền mỏng phẳng lì (#E4E4E7 / #E5E7EB)
    ========================================================================== */
 
 :root {
-    --primary-red: #D90429;
-    --primary-red-hover: #B00020;
-    --primary-red-light: #FFF1F2;
-    --dark-carbon: #111315;
-    --dark-surface: #1E2124;
-    --text-primary: #111827;
-    --text-secondary: #4B5563;
-    --text-muted: #6B7280;
+    --primary-red: #B91C1C;
+    --primary-red-hover: #991B1B;
+    --primary-red-accent: #DC2626;
+    --primary-red-light: #FEF2F2;
+    --dark-carbon: #18181B;
+    --dark-surface: #27272A;
+    --text-primary: #18181B;
+    --text-secondary: #52525B;
+    --text-muted: #71717A;
     --bg-page: #FFFFFF;
-    --bg-light: #F9FAFB;
-    --bg-canvas: #F5F6F8;
-    --border-color: #E5E7EB;
-    --border-dark: #2A2E33;
-    --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
-    --card-hover-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-    --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --bg-light: #F8FAFC;
+    --bg-canvas: #F4F4F5;
+    --border-color: #E4E4E7;
+    --border-dark: #27272A;
+    --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+    --card-hover-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.08);
+    --transition: all 0.2s ease-in-out;
 }
 
 body {
@@ -186,6 +187,26 @@ a:hover {
 }
 
 /* Header Action Icons */
+
+/* Widget Box Styles */
+.widget-box {
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: #fff;
+}
+.widget-header {
+    background: var(--primary-red);
+    color: #fff;
+    padding: 0.5rem;
+    text-align: center;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+.widget-body {
+    padding: 0.75rem;
+}
+
 .header-actions {
     display: flex;
     align-items: center;
@@ -823,3 +844,347 @@ a:hover {
     background-color: var(--primary-red-hover);
     transform: translateY(-2px);
 }
+
+/* --------------------------------------------------------------------------
+   8. VALUE PROPOSITIONS & CATEGORY SECTIONS (TRANG CHỦ TUẦN PHẦN)
+   -------------------------------------------------------------------------- */
+.value-prop-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 18px 16px;
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    transition: var(--transition);
+}
+
+.value-prop-card:hover {
+    border-color: #CBD5E1;
+    background-color: var(--bg-light);
+}
+
+.value-prop-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    background-color: var(--primary-red-light);
+    color: var(--primary-red);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.value-prop-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--dark-carbon);
+    margin-bottom: 2px;
+}
+
+.value-prop-desc {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Category Sections */
+.category-section {
+    margin-bottom: 40px;
+}
+
+.category-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    margin-bottom: 18px;
+    border-bottom: 1.5px solid var(--border-color);
+}
+
+.category-section-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--dark-carbon);
+    margin: 0;
+    border-left: 4px solid var(--primary-red);
+    padding-left: 12px;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.category-section-link {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--primary-red);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: var(--transition);
+}
+
+.category-section-link:hover {
+    color: var(--primary-red-hover);
+    transform: translateX(3px);
+}
+
+/* Stock Badges */
+.stock-badge-in {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #15803D;
+    background-color: #DCFCE7;
+    padding: 2px 7px;
+    border-radius: 4px;
+}
+
+.stock-badge-out {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #B91C1C;
+    background-color: #FEE2E2;
+    padding: 2px 7px;
+    border-radius: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   9. BỘ LỌC CHUYÊN SÂU TẠI GROUP (TẤT CẢ SẢN PHẨM)
+   -------------------------------------------------------------------------- */
+.filter-card-advanced {
+    background: #FFFFFF;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.filter-btn-apply {
+    background-color: var(--primary-red);
+    color: #FFFFFF !important;
+    font-weight: 700;
+    font-size: 0.85rem;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 18px;
+    transition: var(--transition);
+}
+
+.filter-btn-apply:hover {
+    background-color: var(--primary-red-hover);
+}
+
+.filter-btn-reset {
+    background-color: #FFFFFF;
+    color: var(--text-secondary) !important;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 8px 14px;
+    transition: var(--transition);
+}
+
+.filter-btn-reset:hover {
+    background-color: var(--bg-light);
+    color: var(--dark-carbon) !important;
+}
+
+/* Custom Pagination */
+.pagination-custom .page-link {
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    margin: 0 3px;
+    border-radius: 6px !important;
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    transition: var(--transition);
+}
+
+.pagination-custom .page-link:hover {
+    color: var(--primary-red);
+    background-color: var(--primary-red-light);
+    border-color: var(--primary-red);
+}
+
+.pagination-custom .page-item.active .page-link {
+    background-color: var(--primary-red);
+    border-color: var(--primary-red);
+    color: #FFFFFF;
+}
+
+/* --------------------------------------------------------------------------
+   10. LPT CATALOG LAYOUT & WIDGETS
+   -------------------------------------------------------------------------- */
+.lpt-catalog-container {
+    max-width: 1320px;
+    margin: 28px auto 48px;
+    padding: 0 16px;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.lpt-catalog-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+}
+
+.lpt-catalog-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.lpt-widget-box {
+    background: #FFFFFF;
+    border: 1px solid #E4E4E7;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.lpt-widget-header {
+    background-color: #B91C1C;
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 10px 14px;
+    letter-spacing: 0.5px;
+}
+
+.lpt-widget-body {
+    padding: 10px;
+}
+
+.lpt-widget-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.lpt-widget-item {
+    border-bottom: 1px solid #F1F5F9;
+}
+
+.lpt-widget-item:last-child {
+    border-bottom: none;
+}
+
+.lpt-widget-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    font-size: 13px;
+    color: #18181B;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.15s ease-in-out;
+}
+
+.lpt-widget-link:hover,
+.lpt-widget-link.active {
+    background-color: #FEF2F2;
+    color: #B91C1C;
+}
+
+.lpt-widget-link.active {
+    font-weight: 700;
+}
+
+.lpt-widget-link .bullet-icon {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1.5px solid #94A3B8;
+    flex-shrink: 0;
+    transition: all 0.15s ease-in-out;
+}
+
+.lpt-widget-link:hover .bullet-icon,
+.lpt-widget-link.active .bullet-icon {
+    background-color: #B91C1C;
+    border-color: #B91C1C;
+}
+
+.lpt-btn-filter-apply {
+    width: 100%;
+    background-color: #B91C1C;
+    color: #FFFFFF !important;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px;
+    border: none;
+    border-radius: 6px;
+    transition: background-color 0.15s ease;
+}
+
+.lpt-btn-filter-apply:hover {
+    background-color: #991B1B;
+}
+
+.lpt-product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.lpt-btn-addcart {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #FFFFFF;
+    color: #B91C1C !important;
+    border: 1px solid #FECACA;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+}
+
+.lpt-btn-addcart:hover {
+    background-color: #FEF2F2;
+    border-color: #B91C1C;
+    color: #991B1B !important;
+}
+
+@media (max-width: 991px) {
+    .lpt-catalog-container {
+        flex-direction: column;
+        margin-top: 18px;
+    }
+    .lpt-catalog-sidebar {
+        width: 100%;
+    }
+    .lpt-product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+}
+
+@media (max-width: 576px) {
+    .lpt-product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+}
+

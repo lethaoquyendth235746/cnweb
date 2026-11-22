@@ -24,6 +24,16 @@ include("inc/top.php");
                     <i class="bi bi-truck text-danger me-2"></i>Thông tin nhận hàng
                 </h2>
 
+                <?php if(!empty($tb_loi)): ?>
+                <div class="alert alert-danger d-flex align-items-center mb-4 py-3" role="alert">
+                    <i class="bi bi-exclamation-octagon-fill fs-4 me-3 flex-shrink-0 text-danger"></i>
+                    <div>
+                        <strong class="d-block mb-1">Không thể hoàn tất đặt hàng:</strong>
+                        <span class="small"><?php echo htmlspecialchars($tb_loi); ?></span>
+                    </div>
+                </div>
+                <?php endif; ?>
+
                 <?php if(isset($_SESSION["khachhang"])): ?>
                 <div class="alert alert-light border py-2 mb-4 d-flex align-items-center">
                     <i class="bi bi-check-circle-fill text-success fs-5 me-2"></i>

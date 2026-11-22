@@ -68,6 +68,24 @@ class MATHANG{
         }
     }
 
+    // Lấy tối đa N mặt hàng thuộc 1 danh mục (cho phân khu trang chủ)
+    public function laymathangtheodanhmucgioihan($danhmuc_id, $limit = 4){
+        $dbcon = DATABASE::connect();
+        try{
+            $sql = "SELECT * FROM mathang WHERE danhmuc_id=:madm ORDER BY id DESC LIMIT :limit";
+            $cmd = $dbcon->prepare($sql);
+            $cmd->bindValue(":madm", $danhmuc_id, PDO::PARAM_INT);
+            $cmd->bindValue(":limit", (int)$limit, PDO::PARAM_INT);
+            $cmd->execute();
+            return $cmd->fetchAll();
+        }
+        catch(PDOException $e){
+            $error_message = $e->getMessage();
+            echo "<p>Lỗi truy vấn: $error_message</p>";
+            exit();
+        }
+    }
+
     // Lấy mặt hàng theo id
     public function laymathangtheoid($id){
         $dbcon = DATABASE::connect();
@@ -304,14 +322,18 @@ class MATHANG{
             }
 
             if(!empty($mucgia)) {
-                if($mucgia == "duoi_2tr") {
-                    $sql .= " AND giaban < 2000000";
+                if($mucgia == "duoi_1tr" || $mucgia == "duoi_2tr") {
+                    $sql .= " AND giaban < " . ($mucgia == "duoi_1tr" ? "1000000" : "2000000");
+                } elseif($mucgia == "1tr_5tr") {
+                    $sql .= " AND giaban BETWEEN 1000000 AND 5000000";
                 } elseif($mucgia == "2tr_5tr") {
                     $sql .= " AND giaban BETWEEN 2000000 AND 5000000";
                 } elseif($mucgia == "5tr_10tr") {
                     $sql .= " AND giaban BETWEEN 5000000 AND 10000000";
-                } elseif($mucgia == "tren_10tr") {
-                    $sql .= " AND giaban > 10000000";
+                } elseif($mucgia == "5tr_15tr") {
+                    $sql .= " AND giaban BETWEEN 5000000 AND 15000000";
+                } elseif($mucgia == "tren_15tr" || $mucgia == "tren_10tr") {
+                    $sql .= " AND giaban > " . ($mucgia == "tren_15tr" ? "15000000" : "10000000");
                 }
             }
 
@@ -329,6 +351,124 @@ class MATHANG{
             foreach($params as $key => $val) {
                 $cmd->bindValue($key, $val);
             }
+            $cmd->execute();
+            return $cmd->fetchAll();
+        } catch(PDOException $e) {
+            $error_message = $e->getMessage();
+            echo "<p>Lỗi truy vấn: $error_message</p>";
+            exit();
+        }
+    }
+
+    // Đếm tổng số mặt hàng theo bộ lọc (để phân trang)
+    public function demlocmathang($danhmuc_id = null, $dongmay = null, $mucgia = null, $tukhoa = null){
+        $dbcon = DATABASE::connect();
+        try {
+            $sql = "SELECT COUNT(*) as tongso FROM mathang WHERE 1=1";
+            $params = [];
+
+            if(!empty($danhmuc_id) && $danhmuc_id > 0) {
+                $sql .= " AND danhmuc_id = :dmid";
+                $params[":dmid"] = $danhmuc_id;
+            }
+
+            if(!empty($dongmay)) {
+                $sql .= " AND (dongmay LIKE :dongmay OR tenmathang LIKE :dongmay)";
+                $params[":dongmay"] = "%" . $dongmay . "%";
+            }
+
+            if(!empty($tukhoa)) {
+                $sql .= " AND (tenmathang LIKE :tukhoa OR mota LIKE :tukhoa OR dongmay LIKE :tukhoa)";
+                $params[":tukhoa"] = "%" . $tukhoa . "%";
+            }
+
+            if(!empty($mucgia)) {
+                if($mucgia == "duoi_1tr" || $mucgia == "duoi_2tr") {
+                    $sql .= " AND giaban < " . ($mucgia == "duoi_1tr" ? "1000000" : "2000000");
+                } elseif($mucgia == "1tr_5tr") {
+                    $sql .= " AND giaban BETWEEN 1000000 AND 5000000";
+                } elseif($mucgia == "2tr_5tr") {
+                    $sql .= " AND giaban BETWEEN 2000000 AND 5000000";
+                } elseif($mucgia == "5tr_10tr") {
+                    $sql .= " AND giaban BETWEEN 5000000 AND 10000000";
+                } elseif($mucgia == "5tr_15tr") {
+                    $sql .= " AND giaban BETWEEN 5000000 AND 15000000";
+                } elseif($mucgia == "tren_15tr" || $mucgia == "tren_10tr") {
+                    $sql .= " AND giaban > " . ($mucgia == "tren_15tr" ? "15000000" : "10000000");
+                }
+            }
+
+            $cmd = $dbcon->prepare($sql);
+            foreach($params as $key => $val) {
+                $cmd->bindValue($key, $val);
+            }
+            $cmd->execute();
+            $row = $cmd->fetch();
+            return $row ? (int)$row["tongso"] : 0;
+        } catch(PDOException $e) {
+            $error_message = $e->getMessage();
+            echo "<p>Lỗi truy vấn: $error_message</p>";
+            exit();
+        }
+    }
+
+    // Lấy danh sách mặt hàng lọc có phân trang
+    public function locmathangphantrang($danhmuc_id = null, $dongmay = null, $mucgia = null, $sort = null, $tukhoa = null, $offset = 0, $limit = 12){
+        $dbcon = DATABASE::connect();
+        try {
+            $sql = "SELECT * FROM mathang WHERE 1=1";
+            $params = [];
+
+            if(!empty($danhmuc_id) && $danhmuc_id > 0) {
+                $sql .= " AND danhmuc_id = :dmid";
+                $params[":dmid"] = $danhmuc_id;
+            }
+
+            if(!empty($dongmay)) {
+                $sql .= " AND (dongmay LIKE :dongmay OR tenmathang LIKE :dongmay)";
+                $params[":dongmay"] = "%" . $dongmay . "%";
+            }
+
+            if(!empty($tukhoa)) {
+                $sql .= " AND (tenmathang LIKE :tukhoa OR mota LIKE :tukhoa OR dongmay LIKE :tukhoa)";
+                $params[":tukhoa"] = "%" . $tukhoa . "%";
+            }
+
+            if(!empty($mucgia)) {
+                if($mucgia == "duoi_1tr" || $mucgia == "duoi_2tr") {
+                    $sql .= " AND giaban < " . ($mucgia == "duoi_1tr" ? "1000000" : "2000000");
+                } elseif($mucgia == "1tr_5tr") {
+                    $sql .= " AND giaban BETWEEN 1000000 AND 5000000";
+                } elseif($mucgia == "2tr_5tr") {
+                    $sql .= " AND giaban BETWEEN 2000000 AND 5000000";
+                } elseif($mucgia == "5tr_10tr") {
+                    $sql .= " AND giaban BETWEEN 5000000 AND 10000000";
+                } elseif($mucgia == "5tr_15tr") {
+                    $sql .= " AND giaban BETWEEN 5000000 AND 15000000";
+                } elseif($mucgia == "tren_15tr" || $mucgia == "tren_10tr") {
+                    $sql .= " AND giaban > " . ($mucgia == "tren_15tr" ? "15000000" : "10000000");
+                }
+            }
+
+            if($sort == "gia_tang") {
+                $sql .= " ORDER BY giaban ASC";
+            } elseif($sort == "gia_giam") {
+                $sql .= " ORDER BY giaban DESC";
+            } elseif($sort == "banchay") {
+                $sql .= " ORDER BY luotmua DESC, luotxem DESC";
+            } else {
+                $sql .= " ORDER BY id DESC";
+            }
+
+            $sql .= " LIMIT :limit OFFSET :offset";
+
+            $cmd = $dbcon->prepare($sql);
+            foreach($params as $key => $val) {
+                $cmd->bindValue($key, $val);
+            }
+            $cmd->bindValue(":limit", (int)$limit, PDO::PARAM_INT);
+            $cmd->bindValue(":offset", (int)$offset, PDO::PARAM_INT);
+
             $cmd->execute();
             return $cmd->fetchAll();
         } catch(PDOException $e) {

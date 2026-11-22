@@ -55,15 +55,20 @@ $active_dmid = isset($_GET["id"]) ? (int)$_GET["id"] : 0;
                             </a>
                         </li>
                         <li>
-                            <a href="index.php?action=group" class="nav-menu-link <?php if($active_action=='group' && empty($_GET['id']) && empty($_GET['model'])) echo 'active'; ?>">
+                            <a href="index.php?action=gioithieu" class="nav-menu-link <?php if($active_action=='gioithieu') echo 'active'; ?>">
+                                Giới thiệu
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.php?action=group" class="nav-menu-link <?php if(($active_action=='group' || $active_action=='tatcasanpham') && empty($_GET['id']) && empty($_GET['model'])) echo 'active'; ?>">
                                 Tất cả sản phẩm
                             </a>
                         </li>
                         
-                        <!-- Dropdown 7 Danh mục sản phẩm -->
+                        <!-- Dropdown Danh mục linh kiện (Động từ danhmuc) -->
                         <li class="nav-item dropdown">
                             <a href="#" class="nav-menu-link dropdown-toggle <?php if($active_dmid > 0) echo 'active'; ?>" data-bs-toggle="dropdown" aria-expanded="false">
-                                Danh mục sản phẩm
+                                Danh mục linh kiện
                             </a>
                             <ul class="dropdown-menu shadow-sm border" style="border-radius: 8px;">
                                 <?php if(isset($danhmuc) && is_array($danhmuc)): ?>
@@ -78,19 +83,6 @@ $active_dmid = isset($_GET["id"]) ? (int)$_GET["id"] : 0;
                             </ul>
                         </li>
 
-                        <!-- Dropdown Theo dòng máy XAG -->
-                        <li class="nav-item dropdown">
-                            <a href="#" class="nav-menu-link dropdown-toggle <?php if(!empty($active_model)) echo 'active'; ?>" data-bs-toggle="dropdown" aria-expanded="false">
-                                Theo dòng máy XAG
-                            </a>
-                            <ul class="dropdown-menu shadow-sm border" style="border-radius: 8px;">
-                                <li><a class="dropdown-item py-2 px-3 small" href="index.php?action=dongmay&model=P100 Pro"><strong>XAG P100 Pro</strong> (50kg)</a></li>
-                                <li><a class="dropdown-item py-2 px-3 small" href="index.php?action=dongmay&model=P100"><strong>XAG P100</strong> (40kg)</a></li>
-                                <li><a class="dropdown-item py-2 px-3 small" href="index.php?action=dongmay&model=P40"><strong>XAG P40</strong> (Đa năng)</a></li>
-                                <li><a class="dropdown-item py-2 px-3 small" href="index.php?action=dongmay&model=V40"><strong>XAG V40</strong> (2 cánh nâng)</a></li>
-                                <li><a class="dropdown-item py-2 px-3 small" href="index.php?action=dongmay&model=R150"><strong>Robot R150</strong> (Mặt đất)</a></li>
-                            </ul>
-                        </li>
 
                         <li>
                             <a href="index.php?action=lienhe" class="nav-menu-link <?php if($active_action=='lienhe') echo 'active'; ?>">
@@ -174,9 +166,10 @@ $active_dmid = isset($_GET["id"]) ? (int)$_GET["id"] : 0;
         <div class="offcanvas-body">
             <ul class="list-unstyled">
                 <li class="py-2 border-bottom"><a href="index.php" class="fw-bold text-dark d-block">Trang chủ</a></li>
+                <li class="py-2 border-bottom"><a href="index.php?action=gioithieu" class="fw-bold text-dark d-block">Giới thiệu</a></li>
                 <li class="py-2 border-bottom"><a href="index.php?action=group" class="fw-bold text-dark d-block">Tất cả sản phẩm</a></li>
                 <li class="py-2 border-bottom">
-                    <span class="fw-bold text-dark d-block mb-1">Danh mục sản phẩm:</span>
+                    <span class="fw-bold text-dark d-block mb-1">Danh mục linh kiện:</span>
                     <ul class="list-unstyled ps-3 small">
                         <?php if(isset($danhmuc) && is_array($danhmuc)): ?>
                             <?php foreach ($danhmuc as $d): ?>
@@ -186,13 +179,19 @@ $active_dmid = isset($_GET["id"]) ? (int)$_GET["id"] : 0;
                     </ul>
                 </li>
                 <li class="py-2 border-bottom">
-                    <span class="fw-bold text-dark d-block mb-1">Theo dòng máy:</span>
+                    <span class="fw-bold text-dark d-block mb-1">Theo dòng máy XAG:</span>
                     <ul class="list-unstyled ps-3 small">
-                        <li class="py-1"><a href="index.php?action=dongmay&model=P100 Pro" class="text-secondary">XAG P100 Pro</a></li>
-                        <li class="py-1"><a href="index.php?action=dongmay&model=P100" class="text-secondary">XAG P100</a></li>
-                        <li class="py-1"><a href="index.php?action=dongmay&model=P40" class="text-secondary">XAG P40</a></li>
-                        <li class="py-1"><a href="index.php?action=dongmay&model=V40" class="text-secondary">XAG V40</a></li>
-                        <li class="py-1"><a href="index.php?action=dongmay&model=R150" class="text-secondary">Robot R150</a></li>
+                        <?php if(isset($dongmay_list) && is_array($dongmay_list) && !empty($dongmay_list)): ?>
+                            <?php foreach($dongmay_list as $dm_item): ?>
+                            <li class="py-1"><a href="index.php?action=dongmay&model=<?php echo urlencode($dm_item['tendongmay']); ?>" class="text-secondary">XAG <?php echo htmlspecialchars($dm_item['tendongmay']); ?></a></li>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <li class="py-1"><a href="index.php?action=dongmay&model=P100 Pro" class="text-secondary">XAG P100 Pro</a></li>
+                            <li class="py-1"><a href="index.php?action=dongmay&model=P100" class="text-secondary">XAG P100</a></li>
+                            <li class="py-1"><a href="index.php?action=dongmay&model=P40" class="text-secondary">XAG P40</a></li>
+                            <li class="py-1"><a href="index.php?action=dongmay&model=V40" class="text-secondary">XAG V40</a></li>
+                            <li class="py-1"><a href="index.php?action=dongmay&model=R150" class="text-secondary">Robot R150</a></li>
+                        <?php endif; ?>
                     </ul>
                 </li>
                 <li class="py-2"><a href="index.php?action=lienhe" class="fw-bold text-dark d-block">Hỗ trợ kỹ thuật: 0833 609 329</a></li>

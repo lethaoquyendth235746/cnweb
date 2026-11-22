@@ -44,6 +44,13 @@ class DatabaseService {
                 } catch (Exception $e) {
                     error_log('Auto migration failed: ' . $e->getMessage());
                 }
+
+                // Tự động kiểm tra và khởi tạo bảng dongmay nếu chưa tồn tại
+                try {
+                    $this->initDongMaySchema();
+                } catch (Exception $e) {
+                    error_log('Init dongmay schema failed: ' . $e->getMessage());
+                }
             }
         } catch (PDOException $e) {
             throw new RuntimeException("Lỗi kết nối CSDL XAG Store: " . $e->getMessage(), (int)$e->getCode(), $e);
@@ -131,5 +138,51 @@ class DatabaseService {
      */
     public static function lastInsertId(?string $name = null): string|false {
         return self::pdo()->lastInsertId($name);
+    }
+
+    /**
+     * Tự động khởi tạo cấu trúc và dữ liệu mẫu cho bảng dòng máy (dongmay)
+     */
+    private function initDongMaySchema(): void {
+        $sql = "CREATE TABLE IF NOT EXISTS `dongmay` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `tendongmay` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `uk_tendongmay` (`tendongmay`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+        $this->pdo->exec($sql);
+
+        // Kiểm tra xem bảng dongmay có dữ liệu chưa
+        $stmt = $this->pdo->query("SELECT COUNT(*) FROM `dongmay`");
+        $count = (int)$stmt->fetchColumn();
+
+        if ($count === 0) {
+            // Danh sách cơ bản ban đầu
+            $defaultModels = [
+                'XAG P100',
+                'XAG P100 Pro',
+                'XAG P40',
+                'XAG V40',
+                'XAG R150'
+            ];
+
+            // Thu thập thêm các dòng máy đang có trong bảng mathang
+            try {
+                $stmtCheck = $this->pdo->query("SELECT DISTINCT TRIM(`dongmay`) AS dm FROM `mathang` WHERE `dongmay` IS NOT NULL AND TRIM(`dongmay`) != ''");
+                while ($row = $stmtCheck->fetch()) {
+                    $val = trim($row['dm'] ?? '');
+                    if ($val !== '' && !in_array($val, $defaultModels, true)) {
+                        $defaultModels[] = $val;
+                    }
+                }
+            } catch (Throwable $e) {
+                // Bỏ qua nếu bảng mathang chưa có dữ liệu
+            }
+
+            $insertStmt = $this->pdo->prepare("INSERT IGNORE INTO `dongmay` (`tendongmay`) VALUES (:tendongmay)");
+            foreach ($defaultModels as $model) {
+                $insertStmt->execute([':tendongmay' => $model]);
+            }
+        }
     }
 }

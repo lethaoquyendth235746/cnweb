@@ -1,7 +1,7 @@
 <?php
 /**
  * admin/products.php
- * Quản lý Linh kiện & Máy bay Drone XAG - CRUD & Cột DongMay
+ * Quản lý Linh kiện & Máy bay Drone XAG - CRUD & Quản lý Động Dòng máy (dongmay)
  * Giai đoạn 3: Tailwind CSS + ProductAdminService + PRG Pattern
  */
 
@@ -84,6 +84,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: products.php');
         exit;
     }
+
+    // ==========================================
+    // QUẢN LÝ DÒNG MÁY (DONGMAY) ACTIONS
+    // ==========================================
+
+    // Thêm mới dòng máy Drone
+    if ($action === 'create_dongmay') {
+        $tenDongMay = trim($_POST['tendongmay'] ?? '');
+        try {
+            $newId = $productService->addDongMay($tenDongMay);
+            setAdminFlash('success', "Đã thêm mới dòng máy [{$tenDongMay}] thành công (ID: #{$newId})!");
+        } catch (Throwable $e) {
+            setAdminFlash('danger', 'Lỗi thêm dòng máy: ' . $e->getMessage());
+        }
+
+        header('Location: products.php?open=dongmay');
+        exit;
+    }
+
+    // Cập nhật tên dòng máy Drone
+    if ($action === 'update_dongmay') {
+        $id = (int)($_POST['dongmay_id'] ?? 0);
+        $tenMoi = trim($_POST['tendongmay'] ?? '');
+        try {
+            $productService->updateDongMay($id, $tenMoi);
+            setAdminFlash('success', "Đã đổi tên dòng máy thành [{$tenMoi}] và đồng bộ tất cả linh kiện liên quan!");
+        } catch (Throwable $e) {
+            setAdminFlash('danger', 'Lỗi cập nhật dòng máy: ' . $e->getMessage());
+        }
+
+        header('Location: products.php?open=dongmay');
+        exit;
+    }
+
+    // Xóa dòng máy Drone
+    if ($action === 'delete_dongmay') {
+        $id = (int)($_POST['dongmay_id'] ?? 0);
+        try {
+            $productService->deleteDongMay($id);
+            setAdminFlash('success', "Đã xóa dòng máy thành công! Các linh kiện liên quan đã được chuyển sang chế độ 'Dùng chung'.");
+        } catch (Throwable $e) {
+            setAdminFlash('danger', 'Lỗi xóa dòng máy: ' . $e->getMessage());
+        }
+
+        header('Location: products.php?open=dongmay');
+        exit;
+    }
 }
 
 // ==========================================
@@ -110,7 +157,7 @@ $totalProducts = $productsData['total'];
 $totalPages = ceil($totalProducts / $limit);
 
 $categories = $categoryService->getAllCategoriesWithCount();
-$droneModels = $productService->getDroneModels();
+$allDongMay = $productService->getAllDongMay();
 $isSuper = isSuperAdmin();
 
 require_once __DIR__ . '/inc/layout_header.php';
@@ -118,15 +165,22 @@ require_once __DIR__ . '/inc/layout_header.php';
 
 <div class="space-y-6">
 
-    <!-- Tiêu đề trang & Nút thêm mới -->
+    <!-- Tiêu đề trang & Nút hành động -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Quản lý Linh kiện & Drone XAG</h1>
             <p class="text-sm text-slate-500 mt-1">
-                Danh mục máy bay nông nghiệp, phụ tùng thay thế chính hãng XAG P100, P40, V40, R150.
+                Danh mục máy bay nông nghiệp, phụ tùng thay thế chính hãng XAG theo từng dòng máy tương thích.
             </p>
         </div>
         <div class="flex items-center gap-2">
+            <!-- Nút Quản lý Dòng máy -->
+            <button type="button" onclick="openDongMayModal()" class="inline-flex items-center gap-1.5 px-3 py-2.5 bg-white border border-slate-300 hover:border-red-300 text-slate-700 hover:text-red-700 text-xs font-bold rounded-md transition shadow-none">
+                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                <span>Quản lý dòng máy</span>
+            </button>
+
+            <!-- Nút Thêm linh kiện mới -->
             <button type="button" onclick="openCreateModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white text-xs font-bold rounded-md transition shadow-none shadow-none/25">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 <span>Thêm linh kiện mới</span>
@@ -163,9 +217,9 @@ require_once __DIR__ . '/inc/layout_header.php';
                 <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Dòng máy tương thích</label>
                 <select name="dongmay" class="w-full px-3 py-2 text-xs rounded-md bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
                     <option value="">-- Tất cả dòng máy --</option>
-                    <?php foreach ($droneModels as $model): ?>
-                        <option value="<?= htmlspecialchars($model) ?>" <?= ($dongmay === $model) ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($model) ?>
+                    <?php foreach ($allDongMay as $dm): ?>
+                        <option value="<?= htmlspecialchars($dm['tendongmay']) ?>" <?= ($dongmay === $dm['tendongmay']) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($dm['tendongmay']) ?> (<?= (int)$dm['tong_san_pham'] ?>)
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -339,8 +393,8 @@ require_once __DIR__ . '/inc/layout_header.php';
                     <label class="block text-xs font-bold text-slate-700 mb-1">Dòng máy tương thích (dongmay)</label>
                     <select name="dongmay" id="input-dongmay" class="w-full text-xs px-3.5 py-2.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
                         <option value="">Dùng chung / Tất cả model</option>
-                        <?php foreach ($droneModels as $model): ?>
-                            <option value="<?= htmlspecialchars($model) ?>"><?= htmlspecialchars($model) ?></option>
+                        <?php foreach ($allDongMay as $dm): ?>
+                            <option value="<?= htmlspecialchars($dm['tendongmay']) ?>"><?= htmlspecialchars($dm['tendongmay']) ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -385,6 +439,116 @@ require_once __DIR__ . '/inc/layout_header.php';
                 </button>
             </div>
         </form>
+
+    </div>
+</div>
+
+<!-- ==========================================
+     MODAL QUẢN LÝ DÒNG MÁY DRONE (DONGMAY)
+     ========================================== -->
+<div id="dongmay-modal" class="modal-overlay modal-hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="modal-container bg-white w-full max-w-xl rounded-3xl shadow-none border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
+        
+        <!-- Header Modal -->
+        <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+            <div>
+                <h3 class="text-base font-extrabold text-slate-900">Quản lý Dòng máy Drone XAG</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Thêm mới, đổi tên hoặc loại bỏ các dòng máy tương thích</p>
+            </div>
+            <button type="button" onclick="closeModal('dongmay-modal')" class="p-2 text-slate-400 hover:text-slate-600 rounded-md hover:bg-slate-200 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+
+        <div class="p-6 space-y-5 overflow-y-auto">
+            <!-- Form Thêm mới Dòng máy -->
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <label class="block text-xs font-bold text-slate-700 mb-2">Thêm dòng máy mới</label>
+                <form action="products.php" method="POST" class="flex gap-2">
+                    <input type="hidden" name="action" value="create_dongmay">
+                    <input type="text" name="tendongmay" required placeholder="Ví dụ: XAG P150, XAG V50, XAG M500..." class="flex-1 text-xs px-3.5 py-2.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white">
+                    <button type="submit" class="px-4 py-2.5 bg-red-700 hover:bg-red-800 text-white font-bold text-xs rounded-md transition shadow-none whitespace-nowrap">
+                        + Thêm
+                    </button>
+                </form>
+            </div>
+
+            <!-- Danh sách Dòng máy -->
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Danh sách dòng máy (<?= count($allDongMay) ?>)</span>
+                    <span class="text-[11px] text-slate-400">Tự động đồng bộ sang linh kiện</span>
+                </div>
+
+                <div class="border border-slate-200 rounded-xl overflow-hidden">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="py-2.5 px-3">Tên dòng máy</th>
+                                <th class="py-2.5 px-3 text-center">Linh kiện gắn</th>
+                                <th class="py-2.5 px-3 text-right">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <?php if (empty($allDongMay)): ?>
+                                <tr>
+                                    <td colspan="3" class="py-6 text-center text-slate-400">Chưa có dòng máy nào trong hệ thống.</td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($allDongMay as $dm): ?>
+                                    <tr id="dm-row-<?= (int)$dm['id'] ?>" class="table-hover-row">
+                                        <td class="py-2.5 px-3">
+                                            <span class="font-bold text-slate-900"><?= htmlspecialchars($dm['tendongmay']) ?></span>
+                                        </td>
+                                        <td class="py-2.5 px-3 text-center">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold <?= $dm['tong_san_pham'] > 0 ? 'bg-orange-50 text-orange-700 border border-orange-200' : 'bg-slate-100 text-slate-500' ?>">
+                                                <?= (int)$dm['tong_san_pham'] ?> linh kiện
+                                            </span>
+                                        </td>
+                                        <td class="py-2.5 px-3 text-right whitespace-nowrap">
+                                            <div class="flex items-center justify-end gap-1">
+                                                <button type="button" onclick="startEditDongMay(<?= (int)$dm['id'] ?>)" class="px-2 py-1 text-xs text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded font-semibold transition" title="Đổi tên">
+                                                    Sửa
+                                                </button>
+                                                <form action="products.php" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc muốn xóa dòng máy [<?= htmlspecialchars(addslashes($dm['tendongmay'])) ?>]? <?= $dm['tong_san_pham'] > 0 ? "Hiện có {$dm['tong_san_pham']} linh kiện đang gắn nhãn này sẽ được chuyển sang \'Dùng chung\'." : "" ?>');">
+                                                    <input type="hidden" name="action" value="delete_dongmay">
+                                                    <input type="hidden" name="dongmay_id" value="<?= (int)$dm['id'] ?>">
+                                                    <button type="submit" class="px-2 py-1 text-xs text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 rounded font-semibold transition" title="Xóa dòng máy">
+                                                        Xóa
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <!-- Hàng Sửa Dòng Máy (Ẩn mặc định) -->
+                                    <tr id="dm-edit-row-<?= (int)$dm['id'] ?>" class="hidden bg-amber-50/60">
+                                        <td colspan="3" class="p-2.5">
+                                            <form action="products.php" method="POST" class="flex items-center gap-2">
+                                                <input type="hidden" name="action" value="update_dongmay">
+                                                <input type="hidden" name="dongmay_id" value="<?= (int)$dm['id'] ?>">
+                                                <input type="text" name="tendongmay" value="<?= htmlspecialchars($dm['tendongmay']) ?>" required class="flex-1 text-xs px-2.5 py-1.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white">
+                                                <button type="submit" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-md transition">
+                                                    Lưu
+                                                </button>
+                                                <button type="button" onclick="cancelEditDongMay(<?= (int)$dm['id'] ?>)" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-md transition">
+                                                    Hủy
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end">
+            <button type="button" onclick="closeModal('dongmay-modal')" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-md transition">
+                Đóng
+            </button>
+        </div>
 
     </div>
 </div>
@@ -453,6 +617,32 @@ function confirmDeleteProduct(id, name) {
     document.getElementById('delete-product-name').textContent = name;
     openModal('delete-modal');
 }
+
+// Quản lý Modal Dòng máy Drone
+function openDongMayModal() {
+    openModal('dongmay-modal');
+}
+
+function startEditDongMay(id) {
+    const viewRow = document.getElementById('dm-row-' + id);
+    const editRow = document.getElementById('dm-edit-row-' + id);
+    if (viewRow) viewRow.classList.add('hidden');
+    if (editRow) editRow.classList.remove('hidden');
+}
+
+function cancelEditDongMay(id) {
+    const viewRow = document.getElementById('dm-row-' + id);
+    const editRow = document.getElementById('dm-edit-row-' + id);
+    if (viewRow) viewRow.classList.remove('hidden');
+    if (editRow) editRow.classList.add('hidden');
+}
+
+// Tự động mở modal Dòng máy nếu URL có ?open=dongmay
+document.addEventListener('DOMContentLoaded', function() {
+    if (new URLSearchParams(window.location.search).get('open') === 'dongmay') {
+        openDongMayModal();
+    }
+});
 </script>
 
 <?php require_once __DIR__ . '/inc/layout_footer.php'; ?>
