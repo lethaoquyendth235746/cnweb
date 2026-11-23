@@ -30,16 +30,19 @@ class DatabaseService {
 
         try {
             $this->pdo = new PDO($dsn, $this->username, $this->password, $options);
-            // Auto migration: đảm bảo các cột và bảng cần thiết tồn tại (chạy 1 lần mỗi request)
+            // Auto migration: đảm bảo các cột và bảng cần thiết tồn tại (chạy 1 lần nếu chưa có bảng)
             static $migrationRun = false;
             if (!$migrationRun) {
                 $migrationRun = true;
                 try {
-                    $sqlFile = realpath(__DIR__ . '/../../data/update_admin_features.sql');
-                    if ($sqlFile && file_exists($sqlFile)) {
-                        $sql = file_get_contents($sqlFile);
-                        // Thực thi toàn bộ script; MySQL cho phép multiple statements
-                        $this->pdo->exec($sql);
+                    $stmtCheck = $this->pdo->query("SHOW TABLES LIKE 'phieunhap'");
+                    if (!$stmtCheck->fetch()) {
+                        $sqlFile = realpath(__DIR__ . '/../../data/update_admin_features.sql');
+                        if ($sqlFile && file_exists($sqlFile)) {
+                            $sql = file_get_contents($sqlFile);
+                            // Thực thi toàn bộ script; MySQL cho phép multiple statements
+                            $this->pdo->exec($sql);
+                        }
                     }
                 } catch (Exception $e) {
                     error_log('Auto migration failed: ' . $e->getMessage());

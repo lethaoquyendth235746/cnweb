@@ -38,9 +38,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
 
         $mathangIds = $_POST['mathang_id'] ?? [];
-        $soluongs = $_POST['soluong'] ?? [];
-        $dongias = $_POST['dongianhap'] ?? [];
-        $ghichus = $_POST['ghichu_item'] ?? [];
+        $soluongs   = $_POST['soluong'] ?? [];
+        $dongias    = $_POST['dongia'] ?? $_POST['dongianhap'] ?? [];
+        $solos      = $_POST['solo'] ?? $_POST['ghichu_item'] ?? [];
 
         $items = [];
         $seen = [];
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mId = (int)($mathangIds[$i] ?? 0);
             $qty = (int)($soluongs[$i] ?? 0);
             $price = (float)($dongias[$i] ?? 0);
-            $note = trim($ghichus[$i] ?? '');
+            $note = trim($solos[$i] ?? '');
 
             if ($mId > 0 && $qty > 0 && $price >= 0) {
                 if (isset($seen[$mId])) {
@@ -60,7 +60,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'mathang_id'  => $mId,
                         'soluong'     => $qty,
                         'dongianhap'  => $price,
-                        'ghichu'      => $note
+                        'dongia'      => $price,
+                        'ghichu'      => $note,
+                        'solo'        => $note
                     ];
                 }
             }
@@ -69,9 +71,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $res = $inventoryService->createImportReceipt($receiptData, $items, $currentUserId);
             $receiptId = is_array($res) ? ($res['receipt_id'] ?? 0) : $res;
-            setAdminFlash('success', "Đã lập phiếu nhập kho #{$receiptId} thành công! Số lượng tồn kho đã được cộng dồn.");
+            $maphieunhap = is_array($res) ? ($res['maphieunhap'] ?? "#{$receiptId}") : "#{$receiptId}";
+            $successMsg = "Đã lập phiếu nhập kho {$maphieunhap} thành công! Số lượng tồn kho đã được cộng dồn.";
+            setAdminFlash('success', $successMsg);
+            $_SESSION['success'] = $successMsg;
         } catch (Throwable $e) {
-            setAdminFlash('danger', 'Lỗi lập phiếu nhập: ' . $e->getMessage());
+            $errorMsg = 'Lỗi lập phiếu nhập kho: ' . $e->getMessage();
+            setAdminFlash('danger', $errorMsg);
+            $_SESSION['error'] = $errorMsg;
         }
 
         header('Location: inventory.php?tab=receipts');
@@ -393,7 +400,7 @@ require_once __DIR__ . '/inc/layout_header.php';
             <div class="bg-slate-50 p-4 rounded-xl border border-slate-200" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1.5">Nhà cung cấp <span class="text-[#B91C1C]">*</span></label>
-                    <input type="text" name="nhacungcap" required placeholder="XAG Official / XAG Vietnam Corp" class="w-full h-[40px] text-xs px-3.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#B91C1C]/20 focus:border-[#B91C1C] transition bg-white text-slate-800">
+                    <input type="text" name="nhacungcap" required value="XAG Vietnam Corp" placeholder="XAG Official / XAG Vietnam Corp" class="w-full h-[40px] text-xs px-3.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#B91C1C]/20 focus:border-[#B91C1C] transition bg-white text-slate-800">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1.5">Ngày giờ nhập</label>
@@ -438,16 +445,16 @@ require_once __DIR__ . '/inc/layout_header.php';
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <input type="text" name="ghichu_item[]" placeholder="Mã lô / Serial..." class="w-full mt-[6px] text-[11px] h-[28px] px-2.5 rounded-md border border-slate-200 bg-slate-50 text-slate-600 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#B91C1C]/30 focus:border-[#B91C1C] transition">
+                                    <input type="text" name="solo[]" placeholder="Mã lô / Serial..." class="w-full mt-[6px] text-[11px] h-[28px] px-2.5 rounded-md border border-slate-200 bg-slate-50 text-slate-600 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#B91C1C]/30 focus:border-[#B91C1C] transition">
                                 </td>
                                 <td class="py-2.5 px-3 align-middle" style="width: 14%;">
                                     <input type="number" name="soluong[]" min="1" value="1" required oninput="recalculateReceiptTotal()" class="item-qty w-full h-[38px] text-center text-xs font-bold px-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#B91C1C]/20 focus:border-[#B91C1C] transition bg-white text-slate-800">
                                 </td>
                                 <td class="py-2.5 px-3 align-middle" style="width: 20%;">
-                                    <input type="number" name="dongianhap[]" min="0" step="1000" value="0" required oninput="recalculateReceiptTotal()" class="item-price w-full h-[38px] text-right text-xs font-mono-num px-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#B91C1C]/20 focus:border-[#B91C1C] transition bg-white text-slate-800">
+                                    <input type="number" name="dongia[]" min="0" step="any" value="0" required oninput="recalculateReceiptTotal()" class="item-price w-full h-[38px] text-right text-xs font-mono-num px-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#B91C1C]/20 focus:border-[#B91C1C] transition bg-white text-slate-800">
                                 </td>
                                 <td class="py-2.5 px-3 text-right font-bold text-slate-800 font-mono-num item-subtotal text-xs align-middle" style="width: 18%;">
-                                    0 đ
+                                    0 &dstrok;
                                 </td>
                                 <td class="py-2.5 px-3 text-center align-middle" style="width: 6%;">
                                     <button type="button" onclick="removeReceiptRow(this)" class="p-1.5 text-slate-400 hover:text-[#B91C1C] rounded-md hover:bg-red-50 transition" title="Xóa dòng này">
@@ -459,7 +466,7 @@ require_once __DIR__ . '/inc/layout_header.php';
                         <tfoot class="bg-slate-50 font-bold border-t border-slate-200">
                             <tr>
                                 <td colspan="3" class="py-3 px-3 text-right text-xs font-bold text-slate-700">Tổng tiền thanh toán phiếu nhập:</td>
-                                <td id="receipt-grand-total" class="py-3 px-3 text-right text-sm sm:text-base text-[#B91C1C] font-mono-num font-extrabold whitespace-nowrap">0 đ</td>
+                                <td id="receipt-grand-total" class="py-3 px-3 text-right text-sm sm:text-base text-[#B91C1C] font-mono-num font-extrabold whitespace-nowrap">0 &dstrok;</td>
                                 <td></td>
                             </tr>
                         </tfoot>
@@ -514,7 +521,7 @@ require_once __DIR__ . '/inc/layout_header.php';
                     <tfoot class="bg-slate-50 font-bold border-t border-slate-200">
                         <tr>
                             <td colspan="4" class="py-3 px-3 text-right text-slate-700">Tổng giá trị phiếu nhập:</td>
-                            <td id="rc-modal-grand-total" class="py-3 px-3 text-right text-base text-red-600 font-mono-num font-black">0 đ</td>
+                            <td id="rc-modal-grand-total" class="py-3 px-3 text-right text-base text-red-600 font-mono-num font-black">0 &dstrok;</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -558,9 +565,13 @@ require_once __DIR__ . '/inc/layout_header.php';
 </div>
 
 <script>
-function formatVND(amount) {
+function formatMoney(amount) {
     const num = Math.round(Number(amount) || 0);
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " đ";
+}
+
+function formatVND(amount) {
+    return formatMoney(amount);
 }
 
 function openCreateReceiptModal() {
@@ -636,7 +647,7 @@ function addReceiptRow() {
     newRow.querySelector('.item-qty').value = 1;
     newRow.querySelector('.item-price').value = 0;
     newRow.querySelector('.item-subtotal').textContent = '0 đ';
-    const noteInput = newRow.querySelector('input[name="ghichu_item[]"]');
+    const noteInput = newRow.querySelector('input[name="solo[]"]') || newRow.querySelector('input[name="ghichu_item[]"]');
     if (noteInput) noteInput.value = '';
 
     tbody.appendChild(newRow);
@@ -654,6 +665,10 @@ function removeReceiptRow(btn) {
     recalculateReceiptTotal();
 }
 
+function updateReceiptTotal() {
+    recalculateReceiptTotal();
+}
+
 function recalculateReceiptTotal() {
     const rows = document.querySelectorAll('#receipt-items-table tbody tr.receipt-row');
     let grandTotal = 0;
@@ -665,13 +680,13 @@ function recalculateReceiptTotal() {
         grandTotal += subtotal;
         const subtotalEl = row.querySelector('.item-subtotal');
         if (subtotalEl) {
-            subtotalEl.textContent = formatVND(subtotal);
+            subtotalEl.textContent = formatMoney(subtotal);
         }
     });
 
     const grandTotalEl = document.getElementById('receipt-grand-total');
     if (grandTotalEl) {
-        grandTotalEl.textContent = formatVND(grandTotal);
+        grandTotalEl.textContent = formatMoney(grandTotal);
     }
 }
 

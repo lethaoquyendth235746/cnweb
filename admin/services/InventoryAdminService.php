@@ -357,10 +357,21 @@ class InventoryAdminService {
      * @throws InvalidArgumentException|Exception
      */
     public function createImportReceipt(array $headerData, array $items, ?int $userId = null): array {
-        if ($userId === null) {
+        if ($userId === null || $userId <= 0) {
             $userId = (int)($headerData['nguoidung_id'] ?? 0);
         }
-        if (empty($headerData['nhacungcap'])) {
+
+        $pdo = DatabaseService::pdo();
+
+        // Đảm bảo userId luôn hợp lệ và tồn tại trong bảng nguoidung (tránh vi phạm Foreign Key)
+        if ($userId <= 0) {
+            $stmtUser = $pdo->query("SELECT id FROM nguoidung WHERE loai IN (1, 2) AND trangthai = 1 ORDER BY loai ASC, id ASC LIMIT 1");
+            $fallbackId = (int)$stmtUser->fetchColumn();
+            $userId = $fallbackId > 0 ? $fallbackId : 1;
+        }
+
+        $nhacungcap = trim($headerData['nhacungcap'] ?? '');
+        if ($nhacungcap === '') {
             throw new InvalidArgumentException("Tên nhà cung cấp / đơn vị phân phối không được để trống.");
         }
 
@@ -368,7 +379,6 @@ class InventoryAdminService {
             throw new InvalidArgumentException("Phiếu nhập kho phải chứa ít nhất một mặt hàng linh kiện.");
         }
 
-        $pdo = DatabaseService::pdo();
         DatabaseService::beginTransaction();
 
         try {
@@ -380,8 +390,8 @@ class InventoryAdminService {
             foreach ($items as $idx => $it) {
                 $productId = (int)($it['mathang_id'] ?? 0);
                 $qty = (int)($it['soluong'] ?? 0);
-                $unitPrice = (float)($it['dongianhap'] ?? 0);
-                $itemNote = trim($it['ghichu'] ?? '');
+                $unitPrice = (float)($it['dongia'] ?? $it['dongianhap'] ?? 0);
+                $itemNote = trim($it['solo'] ?? $it['ghichu'] ?? '');
 
                 if ($productId <= 0) {
                     throw new InvalidArgumentException("Dòng số " . ($idx + 1) . ": Chưa chọn mặt hàng linh kiện.");
@@ -405,30 +415,37 @@ class InventoryAdminService {
                     'soluong'    => $qty,
                     'dongianhap' => $unitPrice,
                     'thanhtien'  => $lineTotal,
-                    'ghichu'     => $itemNote
+                    'ghichu'     => mb_substr($itemNote, 0, 255)
                 ];
             }
 
             // 2. Sinh mã chứng từ duy nhất
             $receiptCode = $this->generateReceiptCode();
-            $ngaynhap = !empty($headerData['ngaynhap']) ? $headerData['ngaynhap'] : date('Y-m-d H:i:s');
+            $rawNgayNhap = !empty($headerData['ngaynhap']) ? trim($headerData['ngaynhap']) : date('Y-m-d H:i:s');
+            if (strpos($rawNgayNhap, 'T') !== false) {
+                $rawNgayNhap = str_replace('T', ' ', $rawNgayNhap);
+            }
+            if (strlen($rawNgayNhap) === 16) {
+                $rawNgayNhap .= ':00';
+            }
+            $ngaynhap = $rawNgayNhap;
             $ghichu = trim($headerData['ghichu'] ?? '');
 
-            // 3. Chèn vào bảng `phieunhap`
-            $sqlReceipt = "INSERT INTO phieunhap (maphieunhap, nguoidung_id, nhacungcap, ngaynhap, tongtien, trangthai, ghichu)
-                           VALUES (:maphieunhap, :nguoidung_id, :nhacungcap, :ngaynhap, :tongtien, 1, :ghichu)";
+            // 3. Chèn vào bảng `phieunhap` (Đủ các cột NOT NULL, không trùng lặp tham số HY093)
+            $sqlReceipt = "INSERT INTO phieunhap (maphieunhap, nguoidung_id, nhacungcap, ngaynhap, tongtien, trangthai, ghichu, ngaytao)
+                           VALUES (:maphieunhap, :nguoidung_id, :nhacungcap, :ngaynhap, :tongtien, 1, :ghichu, NOW())";
             $stmtReceipt = $pdo->prepare($sqlReceipt);
             $stmtReceipt->bindValue(':maphieunhap', $receiptCode);
             $stmtReceipt->bindValue(':nguoidung_id', $userId, PDO::PARAM_INT);
-            $stmtReceipt->bindValue(':nhacungcap', trim($headerData['nhacungcap']));
+            $stmtReceipt->bindValue(':nhacungcap', $nhacungcap);
             $stmtReceipt->bindValue(':ngaynhap', $ngaynhap);
             $stmtReceipt->bindValue(':tongtien', $totalAmount);
-            $stmtReceipt->bindValue(':ghichu', $ghichu);
+            $stmtReceipt->bindValue(':ghichu', $ghichu !== '' ? $ghichu : null);
             $stmtReceipt->execute();
 
             $receiptId = (int)$pdo->lastInsertId();
 
-            // 4. Chèn chi tiết và cập nhật tồn kho
+            // 4. Chèn chi tiết vào `ct_phieunhap` và cập nhật tồn kho `mathang`
             $sqlItem = "INSERT INTO ct_phieunhap (phieunhap_id, mathang_id, soluong, dongianhap, thanhtien, ghichu)
                         VALUES (:phieunhap_id, :mathang_id, :soluong, :dongianhap, :thanhtien, :ghichu)";
             $stmtItem = $pdo->prepare($sqlItem);
@@ -450,7 +467,7 @@ class InventoryAdminService {
                     ':soluong'      => $vItem['soluong'],
                     ':dongianhap'   => $vItem['dongianhap'],
                     ':thanhtien'    => $vItem['thanhtien'],
-                    ':ghichu'       => $vItem['ghichu']
+                    ':ghichu'       => $vItem['ghichu'] !== '' ? $vItem['ghichu'] : null
                 ]);
 
                 // Khóa dòng sản phẩm và cộng dồn tồn kho
@@ -462,7 +479,7 @@ class InventoryAdminService {
                 }
 
                 // Cập nhật giá gốc mới nhất nếu giá nhập > 0
-                $newGiaGoc = $vItem['dongianhap'] > 0 ? $vItem['dongianhap'] : $product['giagoc'];
+                $newGiaGoc = $vItem['dongianhap'] > 0 ? $vItem['dongianhap'] : (float)$product['giagoc'];
                 $stmtUpdateProduct->execute([
                     ':qty'    => $vItem['soluong'],
                     ':giagoc' => $newGiaGoc,
