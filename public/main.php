@@ -56,6 +56,105 @@ include("inc/top.php");
         </div>
     </section>
 
+    <!-- 2.5. KHỐI LINH KIỆN NỔI BẬT (FEATURED PRODUCTS) -->
+    <?php 
+    $mathangnoibat = $mh->laymathangnoibat(8);
+    if (!empty($mathangnoibat)):
+    ?>
+    <section class="category-section mb-5">
+        <!-- Header phân khu: Tiêu đề có thanh đỏ trầm bên trái + Nút Xem tất cả -->
+        <div class="category-section-header">
+            <h2 class="category-section-title d-flex align-items-center gap-2">
+                <i class="bi bi-star-fill text-warning"></i>
+                <span>LINH KIỆN NỔI BẬT</span>
+            </h2>
+            <a href="index.php?action=group" class="category-section-link">
+                Xem tất cả linh kiện <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        <!-- Lưới hiển thị 8 sản phẩm nổi bật -->
+        <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
+            <?php 
+            foreach($mathangnoibat as $m): 
+                $model_tag = !empty($m["dongmay"]) ? $m["dongmay"] : "XAG Drone";
+                $is_in_stock = isset($m["soluongton"]) && ((int)$m["soluongton"] > 0);
+                $img_src = lay_hinhanh_mathang($m["hinhanh"] ?? "");
+                $is_featured = isset($m["noibat"]) && ((int)$m["noibat"] === 1);
+            ?>
+            <div class="col">
+                <div class="shopify-card">
+                    <!-- Badge Nổi bật góc trên bên trái màu đỏ #B91C1C -->
+                    <?php if ($is_featured): ?>
+                    <span class="badge-featured">
+                        <i class="bi bi-star-fill"></i> NỔI BẬT
+                    </span>
+                    <?php endif; ?>
+
+                    <!-- Badge giảm giá nếu có -->
+                    <?php if ($m["giagoc"] > $m["giaban"]): 
+                        $percent = round((($m["giagoc"] - $m["giaban"]) / $m["giagoc"]) * 100);
+                    ?>
+                    <span class="badge-discount">-<?php echo $percent; ?>%</span>
+                    <?php endif; ?>
+
+                    <!-- Ảnh sản phẩm tỉ lệ vuông 1:1 -->
+                    <a href="index.php?action=detail&id=<?php echo $m["id"]; ?>" class="card-media">
+                        <img src="<?php echo $img_src; ?>" 
+                             alt="<?php echo htmlspecialchars($m["tenmathang"]); ?>" 
+                             loading="lazy" />
+                    </a>
+
+                    <!-- Nội dung thẻ sản phẩm -->
+                    <div class="card-content d-flex flex-column justify-content-between flex-grow-1">
+                        <div>
+                            <!-- Dòng máy tương thích & Tình trạng kho -->
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <span class="card-model-tag"><?php echo htmlspecialchars($model_tag); ?></span>
+                                <?php if($is_in_stock): ?>
+                                <span class="stock-badge-in">
+                                    <i class="bi bi-check2"></i> Còn hàng
+                                </span>
+                                <?php else: ?>
+                                <span class="stock-badge-out">
+                                    <i class="bi bi-dash-circle"></i> Tạm hết
+                                </span>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- Tên linh kiện -->
+                            <h3 class="card-product-title">
+                                <a href="index.php?action=detail&id=<?php echo $m["id"]; ?>" title="<?php echo htmlspecialchars($m["tenmathang"]); ?>">
+                                    <?php echo htmlspecialchars($m["tenmathang"]); ?>
+                                </a>
+                            </h3>
+
+                            <!-- Giá bán đỏ đậm -->
+                            <div class="card-price-row mb-2">
+                                <span class="card-price-sale"><?php echo number_format($m["giaban"]); ?> đ</span>
+                                <?php if ($m["giagoc"] > $m["giaban"]): ?>
+                                <span class="card-price-regular"><?php echo number_format($m["giagoc"]); ?> đ</span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <!-- Nhóm nút hành động -->
+                        <div class="d-flex gap-1 mt-2">
+                            <a href="index.php?action=chovaogio&id=<?php echo $m["id"]; ?>" class="btn-card-action flex-grow-1">
+                                <i class="bi bi-cart-plus"></i> Thêm vào giỏ
+                            </a>
+                            <a href="index.php?action=detail&id=<?php echo $m["id"]; ?>" class="btn btn-sm btn-outline-secondary px-2 d-inline-flex align-items-center justify-content-center" title="Xem chi tiết">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </section>
+    <?php endif; ?>
+
     <!-- 3. HIỂN THỊ DANH MỤC THEO TỪNG PHẦN (TUẦN PHẦN / CATEGORY SECTIONS) -->
     <!-- (Ẩn hoàn toàn bộ lọc khỏi Trang chủ để giao diện thoáng, tinh gọn) -->
     <div class="category-sections-wrapper">

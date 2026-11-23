@@ -48,6 +48,9 @@ class DatabaseService {
                     error_log('Auto migration failed: ' . $e->getMessage());
                 }
 
+                // Tự động kiểm tra và bổ sung cột noibat cho bảng mathang nếu chưa tồn tại
+                $this->initNoiBatSchema();
+
                 // Tự động kiểm tra và khởi tạo bảng dongmay nếu chưa tồn tại
                 try {
                     $this->initDongMaySchema();
@@ -239,5 +242,19 @@ class DatabaseService {
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
         $this->pdo->exec($sql);
+    }
+
+    /**
+     * Tự động kiểm tra và bổ sung cột noibat vào bảng mathang nếu chưa tồn tại
+     */
+    private function initNoiBatSchema(): void {
+        try {
+            $stmt = $this->pdo->query("SHOW COLUMNS FROM `mathang` LIKE 'noibat'");
+            if (!$stmt->fetch()) {
+                $this->pdo->exec("ALTER TABLE mathang ADD COLUMN noibat TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1: Sản phẩm nổi bật, 0: Bình thường'");
+            }
+        } catch (Throwable $e) {
+            error_log('Init noibat schema failed: ' . $e->getMessage());
+        }
     }
 }

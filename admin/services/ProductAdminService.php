@@ -77,6 +77,12 @@ class ProductAdminService {
             $params[':dongmay'] = "%" . trim($filters['dongmay']) . "%";
         }
 
+        // 4. Lọc theo trạng thái nổi bật
+        if (isset($filters['noibat']) && $filters['noibat'] !== '' && $filters['noibat'] !== null) {
+            $where[] = "m.noibat = :noibat";
+            $params[':noibat'] = (int)$filters['noibat'];
+        }
+
         $whereClause = count($where) > 0 ? "WHERE " . implode(" AND ", $where) : "";
 
         // Đếm tổng số
@@ -108,7 +114,7 @@ class ProductAdminService {
         $offset = isset($filters['offset']) ? max(0, (int)$filters['offset']) : 0;
 
         $sql = "SELECT m.id, m.tenmathang, m.mota, m.giagoc, m.giaban, m.soluongton, 
-                       m.hinhanh, m.danhmuc_id, m.dongmay, m.luotxem, m.luotmua,
+                       m.hinhanh, m.danhmuc_id, m.dongmay, m.noibat, m.luotxem, m.luotmua,
                        d.tendanhmuc
                 FROM mathang m
                 JOIN danhmuc d ON m.danhmuc_id = d.id
@@ -150,7 +156,7 @@ class ProductAdminService {
         $pdo = DatabaseService::pdo();
 
         $sql = "SELECT m.id, m.tenmathang, m.mota, m.giagoc, m.giaban, m.soluongton, 
-                       m.hinhanh, m.danhmuc_id, m.dongmay, m.luotxem, m.luotmua,
+                       m.hinhanh, m.danhmuc_id, m.dongmay, m.noibat, m.luotxem, m.luotmua,
                        d.tendanhmuc
                 FROM mathang m
                 JOIN danhmuc d ON m.danhmuc_id = d.id
@@ -203,8 +209,8 @@ class ProductAdminService {
         // Xử lý dòng máy
         $dongmay = $this->formatDongMay($data['dongmay'] ?? null);
 
-        $sql = "INSERT INTO mathang (tenmathang, mota, giagoc, giaban, soluongton, hinhanh, danhmuc_id, dongmay, luotxem, luotmua)
-                VALUES (:tenmathang, :mota, :giagoc, :giaban, :soluongton, :hinhanh, :danhmuc_id, :dongmay, 0, 0)";
+        $sql = "INSERT INTO mathang (tenmathang, mota, giagoc, giaban, soluongton, hinhanh, danhmuc_id, dongmay, noibat, luotxem, luotmua)
+                VALUES (:tenmathang, :mota, :giagoc, :giaban, :soluongton, :hinhanh, :danhmuc_id, :dongmay, :noibat, 0, 0)";
 
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':tenmathang', trim($data['tenmathang']));
@@ -215,6 +221,8 @@ class ProductAdminService {
         $stmt->bindValue(':hinhanh', $imagePath);
         $stmt->bindValue(':danhmuc_id', (int)$data['danhmuc_id'], PDO::PARAM_INT);
         $stmt->bindValue(':dongmay', $dongmay);
+        // Bind featured flag (default 0 if not provided)
+        $stmt->bindValue(':noibat', isset($data['noibat']) ? (int)$data['noibat'] : 0, PDO::PARAM_INT);
         $stmt->execute();
 
         return (int)$pdo->lastInsertId();
@@ -253,7 +261,8 @@ class ProductAdminService {
                     soluongton = :soluongton,
                     hinhanh = :hinhanh,
                     danhmuc_id = :danhmuc_id,
-                    dongmay = :dongmay
+                    dongmay = :dongmay,
+                    noibat = :noibat
                 WHERE id = :id";
 
         $stmt = $pdo->prepare($sql);
@@ -265,9 +274,34 @@ class ProductAdminService {
         $stmt->bindValue(':hinhanh', $imagePath);
         $stmt->bindValue(':danhmuc_id', (int)$data['danhmuc_id'], PDO::PARAM_INT);
         $stmt->bindValue(':dongmay', $dongmay);
+        // Bind featured flag (default 0 if not provided)
+        $stmt->bindValue(':noibat', isset($data['noibat']) ? (int)$data['noibat'] : 0, PDO::PARAM_INT);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
 
         return $stmt->execute();
+    }
+
+    /**
+     * Bật / tắt trạng thái nổi bật của sản phẩm (1-click)
+     *
+     * @param int $id
+     * @return int Trạng thái mới (1 hoặc 0)
+     * @throws DomainException|Exception
+     */
+    public function toggleNoiBat(int $id): int {
+        $existing = $this->getProductById($id);
+        if (!$existing) {
+            throw new DomainException("Mặt hàng linh kiện ID {$id} không tồn tại.");
+        }
+
+        $newStatus = empty($existing['noibat']) ? 1 : 0;
+        $pdo = DatabaseService::pdo();
+        $stmt = $pdo->prepare("UPDATE mathang SET noibat = :noibat WHERE id = :id");
+        $stmt->bindValue(':noibat', $newStatus, PDO::PARAM_INT);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $newStatus;
     }
 
     /**

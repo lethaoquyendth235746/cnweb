@@ -32,7 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'giagoc'     => $_POST['giagoc'] ?? 0,
                 'giaban'     => $_POST['giaban'] ?? 0,
                 'soluongton' => $_POST['soluongton'] ?? 0,
-                'mota'       => $_POST['mota'] ?? ''
+                'mota'       => $_POST['mota'] ?? '',
+                'noibat'     => isset($_POST['noibat']) ? 1 : 0
             ];
             $file = isset($_FILES['hinhanh']) && $_FILES['hinhanh']['error'] !== UPLOAD_ERR_NO_FILE ? $_FILES['hinhanh'] : null;
 
@@ -57,7 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'giagoc'     => $_POST['giagoc'] ?? 0,
                 'giaban'     => $_POST['giaban'] ?? 0,
                 'soluongton' => $_POST['soluongton'] ?? 0,
-                'mota'       => $_POST['mota'] ?? ''
+                'mota'       => $_POST['mota'] ?? '',
+                'noibat'     => isset($_POST['noibat']) ? 1 : 0
             ];
             $file = isset($_FILES['hinhanh']) && $_FILES['hinhanh']['error'] !== UPLOAD_ERR_NO_FILE ? $_FILES['hinhanh'] : null;
 
@@ -68,6 +70,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         header('Location: products.php');
+        exit;
+    }
+
+    // Bật/tắt trạng thái nổi bật (1-click)
+    if ($action === 'toggle_noibat') {
+        $id = (int)($_POST['product_id'] ?? 0);
+        try {
+            $newVal = $productService->toggleNoiBat($id);
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'success' => true,
+                    'noibat'  => $newVal,
+                    'message' => $newVal ? "Đã bật trạng thái nổi bật cho linh kiện #{$id}!" : "Đã tắt trạng thái nổi bật cho linh kiện #{$id}!"
+                ]);
+                exit;
+            }
+            setAdminFlash('success', "Đã " . ($newVal ? "bật" : "tắt") . " trạng thái nổi bật cho linh kiện #{$id}!");
+        } catch (Throwable $e) {
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                exit;
+            }
+            setAdminFlash('danger', 'Lỗi cập nhật nổi bật: ' . $e->getMessage());
+        }
+
+        $redirect = !empty($_POST['return_url']) ? $_POST['return_url'] : 'products.php';
+        header('Location: ' . $redirect);
         exit;
     }
 
@@ -140,6 +171,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $search = trim($_GET['search'] ?? '');
 $danhmucId = (isset($_GET['danhmuc_id']) && $_GET['danhmuc_id'] !== '') ? (int)$_GET['danhmuc_id'] : null;
 $dongmay = trim($_GET['dongmay'] ?? '');
+$noibat = (isset($_GET['noibat']) && $_GET['noibat'] !== '') ? (int)$_GET['noibat'] : null;
 $page = max(1, (int)($_GET['page'] ?? 1));
 $limit = 12;
 $offset = ($page - 1) * $limit;
@@ -148,6 +180,7 @@ $filters = [
     'search'     => $search,
     'danhmuc_id' => $danhmucId,
     'dongmay'    => $dongmay,
+    'noibat'     => $noibat,
     'limit'      => $limit,
     'offset'     => $offset
 ];
@@ -191,7 +224,7 @@ require_once __DIR__ . '/inc/layout_header.php';
 
     <!-- THANH BỘ LỌC ĐA NĂNG -->
     <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-none">
-        <form action="products.php" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <form action="products.php" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
             <div>
                 <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Tìm kiếm linh kiện</label>
                 <div class="relative">
@@ -226,10 +259,19 @@ require_once __DIR__ . '/inc/layout_header.php';
                 </select>
             </div>
 
+            <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Sản phẩm nổi bật</label>
+                <select name="noibat" class="w-full px-3 py-2 text-xs rounded-md bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white transition">
+                    <option value="">-- Tất cả trạng thái --</option>
+                    <option value="1" <?= ($noibat === 1) ? 'selected' : '' ?>>⭐ Sản phẩm nổi bật</option>
+                    <option value="0" <?= ($noibat === 0) ? 'selected' : '' ?>>Sản phẩm thông thường</option>
+                </select>
+            </div>
+
             <div class="flex items-end gap-2">
                 <button type="submit" class="flex-1 py-2 px-4 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-md transition shadow-none flex items-center justify-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                    <span>Lọc sản phẩm</span>
+                    <span>Lọc</span>
                 </button>
                 <a href="products.php" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-md transition" title="Xóa bộ lọc">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
@@ -250,13 +292,14 @@ require_once __DIR__ . '/inc/layout_header.php';
                         <th class="py-3.5 px-4 text-right">Giá vốn / Giá bán</th>
                         <th class="py-3.5 px-4 text-center">Tồn kho</th>
                         <th class="py-3.5 px-4 text-center">Lượt xem/mua</th>
+                        <th class="py-3.5 px-4 text-center">Nổi bật</th>
                         <th class="py-3.5 px-4 text-right">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     <?php if (empty($products)): ?>
                         <tr>
-                            <td colspan="7" class="py-12 text-center text-slate-400">
+                            <td colspan="8" class="py-12 text-center text-slate-400">
                                 <p class="font-medium text-slate-600">Không tìm thấy linh kiện nào phù hợp.</p>
                                 <a href="products.php" class="text-xs text-red-600 hover:underline mt-1">Xóa bộ lọc</a>
                             </td>
@@ -265,6 +308,7 @@ require_once __DIR__ . '/inc/layout_header.php';
                         <?php foreach ($products as $p): 
                             $imgUrl = MATHANG::layHinhAnh($p['hinhanh'], '../');
                             $ton = (int)$p['soluongton'];
+                            $isNoiBat = !empty($p['noibat']);
                         ?>
                             <tr class="table-hover-row transition-colors">
                                 <td class="py-3.5 px-4">
@@ -284,7 +328,7 @@ require_once __DIR__ . '/inc/layout_header.php';
                                 <td class="py-3.5 px-4">
                                     <?php if (!empty($p['dongmay'])): ?>
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-200">
-                                            <?= htmlspecialchars($p['dongmay']) ?>
+                                             <?= htmlspecialchars($p['dongmay']) ?>
                                         </span>
                                     <?php else: ?>
                                         <span class="text-slate-400 italic text-[11px]">Dùng chung</span>
@@ -312,6 +356,19 @@ require_once __DIR__ . '/inc/layout_header.php';
                                 <td class="py-3.5 px-4 text-center text-slate-500 font-mono-num whitespace-nowrap">
                                     <div><?= number_format($p['luotmua']) ?> đã mua</div>
                                     <div class="text-[10px] text-slate-400"><?= number_format($p['luotxem']) ?> xem</div>
+                                </td>
+                                <!-- Cột Bật/Tắt Sản phẩm Nổi bật (1-click Ngôi sao) -->
+                                <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                                    <button type="button" 
+                                            onclick="toggleNoiBat(<?= (int)$p['id'] ?>, this)" 
+                                            class="star-toggle-btn p-1.5 rounded-lg border transition inline-flex items-center justify-center <?= $isNoiBat ? 'bg-amber-50 border-amber-200 text-[#F59E0B]' : 'bg-slate-50 border-slate-200 text-slate-300 hover:text-slate-400' ?>" 
+                                            title="<?= $isNoiBat ? 'Đang nổi bật (Bấm 1-click để tắt)' : 'Bình thường (Bấm 1-click để bật nổi bật)' ?>"
+                                            data-id="<?= (int)$p['id'] ?>"
+                                            data-noibat="<?= $isNoiBat ? '1' : '0' ?>">
+                                        <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                        </svg>
+                                    </button>
                                 </td>
                                 <td class="py-3.5 px-4 text-right whitespace-nowrap">
                                     <div class="flex items-center justify-end gap-1.5">
@@ -429,6 +486,15 @@ require_once __DIR__ . '/inc/layout_header.php';
                     <img id="product-img-preview" src="../images/products/no-image.png" class="w-16 h-16 rounded-md object-cover border border-slate-200" alt="Preview">
                     <input type="file" name="hinhanh" accept="image/*" data-preview-target="product-img-preview" class="text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100">
                 </div>
+            </div>
+
+            <!-- Checkbox Sản phẩm nổi bật -->
+            <div class="flex items-center gap-3 p-3 bg-amber-50/60 rounded-xl border border-amber-200/60">
+                <input type="checkbox" name="noibat" id="input-noibat" value="1" class="w-4 h-4 text-amber-500 rounded border-slate-300 focus:ring-amber-400 focus:ring-offset-0 cursor-pointer">
+                <label for="input-noibat" class="text-xs font-bold text-slate-800 cursor-pointer flex items-center gap-1.5 select-none">
+                    <svg class="w-4 h-4 text-amber-500 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                    <span>Hiển thị ở mục Sản phẩm nổi bật trên Trang chủ</span>
+                </label>
             </div>
 
             <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
@@ -585,6 +651,7 @@ function openCreateModal() {
     document.getElementById('product-form-action').value = 'create_product';
     document.getElementById('product-form-id').value = '';
     document.getElementById('product-form').reset();
+    document.getElementById('input-noibat').checked = false;
     document.getElementById('product-img-preview').src = '../images/products/no-image.png';
     document.getElementById('product-modal-submit-btn').textContent = 'Thêm linh kiện';
     openModal('product-modal');
@@ -601,6 +668,7 @@ function openEditModal(prod) {
     document.getElementById('input-giaban').value = prod.giaban || 0;
     document.getElementById('input-soluongton').value = prod.soluongton || 0;
     document.getElementById('input-mota').value = prod.mota || '';
+    document.getElementById('input-noibat').checked = (parseInt(prod.noibat) === 1);
 
     const imgPreview = document.getElementById('product-img-preview');
     if (prod.hinhanh) {
@@ -611,6 +679,47 @@ function openEditModal(prod) {
 
     document.getElementById('product-modal-submit-btn').textContent = 'Lưu thay đổi';
     openModal('product-modal');
+}
+
+function toggleNoiBat(id, btn) {
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+
+    const formData = new FormData();
+    formData.append('action', 'toggle_noibat');
+    formData.append('product_id', id);
+
+    fetch('products.php', {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        if (data && data.success) {
+            const isNoiBat = (parseInt(data.noibat) === 1);
+            btn.setAttribute('data-noibat', isNoiBat ? '1' : '0');
+            if (isNoiBat) {
+                btn.className = 'star-toggle-btn p-1.5 rounded-lg border transition inline-flex items-center justify-center bg-amber-50 border-amber-200 text-[#F59E0B]';
+                btn.title = 'Đang nổi bật (Bấm 1-click để tắt)';
+            } else {
+                btn.className = 'star-toggle-btn p-1.5 rounded-lg border transition inline-flex items-center justify-center bg-slate-50 border-slate-200 text-slate-300 hover:text-slate-400';
+                btn.title = 'Bình thường (Bấm 1-click để bật nổi bật)';
+            }
+        } else {
+            alert((data && data.error) ? data.error : 'Không thể cập nhật trạng thái nổi bật.');
+        }
+    })
+    .catch(err => {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        console.error(err);
+        alert('Lỗi kết nối máy chủ khi đổi trạng thái nổi bật.');
+    });
 }
 
 function confirmDeleteProduct(id, name) {

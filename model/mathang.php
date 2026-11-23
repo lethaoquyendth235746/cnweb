@@ -119,17 +119,41 @@ class MATHANG{
             exit();
         }
     }
-    // Lấy mặt hàng xem nhiều
-    public function laymathangxemnhieu(){
+    /**
+     * Lấy danh sách mặt hàng nổi bật / đang kinh doanh
+     *
+     * @param int $limit Số lượng tối đa (mặc định 8)
+     * @return array
+     */
+    public function laymathangnoibat($limit = 8){
         $dbcon = DATABASE::connect();
-        try{
+        try {
+            $sql = "SELECT * FROM mathang WHERE soluongton >= 0 ORDER BY noibat DESC, luotmua DESC, id DESC LIMIT :limit";
+            $cmd = $dbcon->prepare($sql);
+            $cmd->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+            $cmd->execute();
+            return $cmd->fetchAll();
+        } catch (PDOException $e) {
+            $error_message = $e->getMessage();
+            echo "<p>Lỗi truy vấn: $error_message</p>";
+            exit();
+        }
+    }
+
+/**
+     * Lấy mặt hàng xem nhiều (top 3 lượt xem)
+     *
+     * @return array
+     */
+    public function laymathangxemnhieu(): array {
+        $dbcon = DATABASE::connect();
+        try {
             $sql = "SELECT * FROM mathang ORDER BY luotxem DESC LIMIT 3";
             $cmd = $dbcon->prepare($sql);
             $cmd->execute();
             $result = $cmd->fetchAll();
             return $result;
-        }
-        catch(PDOException $e){
+        } catch (PDOException $e) {
             $error_message = $e->getMessage();
             echo "<p>Lỗi truy vấn: $error_message</p>";
             exit();
