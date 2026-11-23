@@ -5,7 +5,17 @@ include("inc/top.php");
 require_once __DIR__ . '/../config/payment_config.php';
 if (!defined('VIETQR_BANK_NAME')) define('VIETQR_BANK_NAME', 'MB Bank - Viettel Money');
 
-$tong_tien_don = (int)tinhtiengiohang();
+// Tính tổng tiền & số món cho các mặt hàng được chọn thanh toán
+$tong_tien_don = 0;
+if(isset($giohang) && is_array($giohang)){
+    foreach($giohang as $mh_item){
+        $tong_tien_don += (int)($mh_item['thanhtien'] ?? ($mh_item['giaban'] * $mh_item['soluong']));
+    }
+} else {
+    $tong_tien_don = (int)tinhtiengiohang();
+}
+$soluong_mon_checkout = isset($giohang) ? count($giohang) : demhangtronggio();
+
 $phone_khach = $_SESSION["khachhang"]["sodienthoai"] ?? "";
 $noi_dung_ck_tam = PAYMENT_PREFIX . " " . (!empty($phone_khach) ? preg_replace('/[^0-9]/', '', $phone_khach) : "DH");
 $vietqr_preview_url = "https://img.vietqr.io/image/" . VIETQR_BANK_ID . "-" . VIETQR_ACCOUNT_NO . "-" . VIETQR_TEMPLATE . ".png?amount=" . $tong_tien_don . "&addInfo=" . urlencode($noi_dung_ck_tam) . "&accountName=" . urlencode(VIETQR_ACCOUNT_NAME);
@@ -338,7 +348,7 @@ $vietqr_preview_url = "https://img.vietqr.io/image/" . VIETQR_BANK_ID . "-" . VI
         <div class="col-lg-5">
             <div class="bg-white p-4 rounded border">
                 <h3 class="h6 fw-bold text-dark text-uppercase border-bottom pb-2 mb-3">
-                    Chi tiết đơn hàng (<?php echo demhangtronggio(); ?> sản phẩm)
+                    Chi tiết đơn hàng (<?php echo $soluong_mon_checkout; ?> sản phẩm)
                 </h3>
 
                 <div class="table-responsive mb-3">
@@ -370,7 +380,7 @@ $vietqr_preview_url = "https://img.vietqr.io/image/" . VIETQR_BANK_ID . "-" . VI
                 <div class="p-3 bg-light rounded small mb-3">
                     <div class="d-flex justify-content-between mb-1">
                         <span class="text-secondary">Tạm tính:</span>
-                        <strong class="text-dark"><?php echo number_format(tinhtiengiohang()); ?> đ</strong>
+                        <strong class="text-dark"><?php echo number_format($tong_tien_don); ?> đ</strong>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-secondary">Phương thức:</span>
@@ -379,7 +389,7 @@ $vietqr_preview_url = "https://img.vietqr.io/image/" . VIETQR_BANK_ID . "-" . VI
                     <hr class="my-2">
                     <div class="d-flex justify-content-between align-items-baseline">
                         <span class="fw-bold text-dark">TỔNG TIỀN:</span>
-                        <span class="fs-4 fw-bolder text-danger"><?php echo number_format(tinhtiengiohang()); ?> đ</span>
+                        <span class="fs-4 fw-bolder text-danger"><?php echo number_format($tong_tien_don); ?> đ</span>
                     </div>
                 </div>
 

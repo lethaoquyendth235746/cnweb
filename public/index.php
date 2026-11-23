@@ -149,6 +149,14 @@ switch($action){
         include("cart.php");
         break;
 
+    case "xoamathang":
+        if(isset($_REQUEST["id"])){
+            xoamotmathang($_REQUEST["id"]);
+        }
+        header("Location: index.php?action=giohang");
+        exit();
+        break;
+
     case "capnhatgio":
         if(isset($_REQUEST["mh"])){
             $mh_post = $_REQUEST["mh"];
@@ -159,22 +167,55 @@ switch($action){
                     xoamotmathang($id);                
             }
         }  
-        $giohang = laygiohang();   
-        include("cart.php");
+        header("Location: index.php?action=giohang");
+        exit();
         break;
 
     case "xoagiohang":  
         xoagiohang();
+        unset($_SESSION['checkout_items']);
         $giohang = laygiohang();   
         include("cart.php");
         break;
 
-    case "thanhtoan":        
-        $giohang = laygiohang();
-        if(empty($giohang)){
+    case "thanhtoan":
+        // Cập nhật số lượng nếu form giỏ hàng gửi kèm
+        if(isset($_POST["mh"]) && is_array($_POST["mh"])){
+            foreach ($_POST["mh"] as $id => $soluong) {
+                if((int)$soluong > 0)
+                    capnhatsoluong($id, (int)$soluong);
+                else 
+                    xoamotmathang($id);                
+            }
+        }
+
+        $giohang_full = laygiohang();
+        if(empty($giohang_full)){
             header("Location: index.php?action=giohang");
             exit();
         }
+
+        // Lấy danh sách sản phẩm được chọn từ POST
+        if(isset($_POST['selected_items']) && is_array($_POST['selected_items'])){
+            $selected_ids = array_map('intval', $_POST['selected_items']);
+            $_SESSION['checkout_items'] = $selected_ids;
+        }
+
+        // Lọc giỏ hàng thanh toán theo danh sách chọn
+        $giohang = [];
+        if(isset($_SESSION['checkout_items']) && !empty($_SESSION['checkout_items'])){
+            foreach($_SESSION['checkout_items'] as $id){
+                if(isset($giohang_full[$id])){
+                    $giohang[$id] = $giohang_full[$id];
+                }
+            }
+        }
+        // Nếu không có danh sách lọc hoặc rỗng thì mặc định lấy toàn bộ giỏ hàng
+        if(empty($giohang)){
+            $giohang = $giohang_full;
+            $_SESSION['checkout_items'] = array_keys($giohang_full);
+        }
+
         // Ràng buộc yêu cầu đăng nhập theo Phương án A
         if(!isset($_SESSION["khachhang"])){
             $_SESSION['redirect_after_login'] = 'index.php?action=thanhtoan';
@@ -187,10 +228,23 @@ switch($action){
         break;
 
     case "luudonhang": 
-        $giohang = laygiohang();
-        if(empty($giohang)){
+        $giohang_full = laygiohang();
+        if(empty($giohang_full)){
             header("Location: index.php?action=giohang");
             exit();
+        }
+
+        // Lọc danh sách mặt hàng được mua theo các món đã chọn
+        $giohang = [];
+        if(isset($_SESSION['checkout_items']) && !empty($_SESSION['checkout_items'])){
+            foreach($_SESSION['checkout_items'] as $id){
+                if(isset($giohang_full[$id])){
+                    $giohang[$id] = $giohang_full[$id];
+                }
+            }
+        }
+        if(empty($giohang)){
+            $giohang = $giohang_full;
         }
 
         $diachi = isset($_POST["txtdiachi"]) ? trim($_POST["txtdiachi"]) : "";
@@ -241,16 +295,25 @@ switch($action){
             }
         }
         
+        // Tính tổng tiền cho các mặt hàng được chọn
+        $tongtien = 0;
+        foreach($giohang as $mh_item){
+            $tongtien += (int)($mh_item['thanhtien'] ?? ($mh_item['giaban'] * $mh_item['soluong']));
+        }
+
         // Đặt hàng an toàn bằng Transaction & Kiểm tra đủ tồn kho
         $dh = new DONHANG();
-        $tongtien = tinhtiengiohang();
         $phuongthuc = (isset($_POST["opt_thanhtoan"]) && $_POST["opt_thanhtoan"] === 'VIETQR') ? 'VIETQR' : 'COD';
         $result = $dh->datHangAnToan($khachhang_id, $diachi_id, $tongtien, $giohang, $phuongthuc, 0);
         
         if($result['success']){
             $donhang_id = $result['donhang_id'];
-            // Xóa giỏ hàng
-            xoagiohang();
+            // Chỉ xóa khỏi giỏ hàng những món vừa được đặt mua thành công
+            foreach(array_keys($giohang) as $bought_id){
+                xoamotmathang($bought_id);
+            }
+            unset($_SESSION['checkout_items']);
+
             // Chuyển đến trang xác nhận hóa đơn & mã QR nếu có
             $phuongthucthanhtoan = $phuongthuc;
             include("message.php");

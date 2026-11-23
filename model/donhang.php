@@ -112,7 +112,7 @@ class DONHANG{
 
             $sqlStock = "UPDATE mathang 
                          SET soluongton = soluongton - :soluong, 
-                             luotmua = luotmua + :soluong 
+                             luotmua = luotmua + :soluong_lm 
                          WHERE id = :id";
             $cmdStock = $db->prepare($sqlStock);
 
@@ -129,6 +129,7 @@ class DONHANG{
                 $cmdItem->execute();
 
                 $cmdStock->bindValue(':soluong', $soluong);
+                $cmdStock->bindValue(':soluong_lm', $soluong);
                 $cmdStock->bindValue(':id', $id);
                 $cmdStock->execute();
             }
@@ -194,13 +195,13 @@ class DONHANG{
             $items = $stmtItems->fetchAll();
 
             $stmtRestock = $db->prepare("UPDATE mathang 
-                                         SET soluongton = soluongton + :soluong, 
-                                             luotmua = GREATEST(0, luotmua - :soluong) 
+                                         SET soluongton = soluongton + :qty 
                                          WHERE id = :id");
             foreach($items as $it){
-                $stmtRestock->bindValue(':soluong', (int)$it["soluong"]);
-                $stmtRestock->bindValue(':id', $it["mathang_id"]);
-                $stmtRestock->execute();
+                $stmtRestock->execute([
+                    ':qty' => (int)$it["soluong"],
+                    ':id'  => (int)$it["mathang_id"]
+                ]);
             }
 
             $db->commit();

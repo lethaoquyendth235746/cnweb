@@ -307,15 +307,15 @@ class OrderAdminService {
 
                 $stmtUpdateStock = $pdo->prepare(
                     "UPDATE mathang 
-                     SET soluongton = soluongton + :soluong,
-                         luotmua = GREATEST(0, luotmua - :soluong)
+                     SET soluongton = soluongton + :qty 
                      WHERE id = :id"
                 );
 
                 foreach ($items as $it) {
-                    $stmtUpdateStock->bindValue(':soluong', (int)$it['soluong'], PDO::PARAM_INT);
-                    $stmtUpdateStock->bindValue(':id', (int)$it['mathang_id'], PDO::PARAM_INT);
-                    $stmtUpdateStock->execute();
+                    $stmtUpdateStock->execute([
+                        ':qty' => (int)$it['soluong'],
+                        ':id'  => (int)$it['mathang_id']
+                    ]);
                 }
             }
 
