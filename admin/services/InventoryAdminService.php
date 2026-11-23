@@ -59,9 +59,11 @@ class InventoryAdminService {
 
         // Tìm kiếm theo từ khóa
         if (!empty($filters['keyword'])) {
-            $kw = trim($filters['keyword']);
-            $where[] = "(m.tenmathang LIKE :kw OR m.dongmay LIKE :kw OR d.tendanhmuc LIKE :kw)";
-            $params[':kw'] = "%{$kw}%";
+            $kw = '%' . trim($filters['keyword']) . '%';
+            $where[] = "(m.tenmathang LIKE :kw_name OR m.dongmay LIKE :kw_model OR d.tendanhmuc LIKE :kw_cat)";
+            $params[':kw_name'] = $kw;
+            $params[':kw_model'] = $kw;
+            $params[':kw_cat'] = $kw;
         }
 
         $whereClause = count($where) > 0 ? "WHERE " . implode(" AND ", $where) : "";
@@ -174,9 +176,11 @@ class InventoryAdminService {
         }
 
         if (!empty($filters['search'])) {
-            $kw = trim($filters['search']);
-            $where[] = "(pn.maphieunhap LIKE :kw OR pn.nhacungcap LIKE :kw OR nd.hoten LIKE :kw)";
-            $params[':kw'] = "%{$kw}%";
+            $kw = '%' . trim($filters['search']) . '%';
+            $where[] = "(pn.maphieunhap LIKE :search_code OR pn.nhacungcap LIKE :search_supplier OR nd.hoten LIKE :search_creator)";
+            $params[':search_code'] = $kw;
+            $params[':search_supplier'] = $kw;
+            $params[':search_creator'] = $kw;
         }
 
         $whereClause = count($where) > 0 ? "WHERE " . implode(" AND ", $where) : "";
@@ -433,36 +437,37 @@ class InventoryAdminService {
             $stmtLock = $pdo->prepare($sqlLockProduct);
 
             $sqlUpdateProduct = "UPDATE mathang 
-                                 SET soluongton = soluongton + :soluong,
+                                 SET soluongton = soluongton + :qty,
                                      giagoc = :giagoc
                                  WHERE id = :id";
             $stmtUpdateProduct = $pdo->prepare($sqlUpdateProduct);
 
             foreach ($validatedItems as $vItem) {
                 // Chèn dòng chi tiết
-                $stmtItem->bindValue(':phieunhap_id', $receiptId, PDO::PARAM_INT);
-                $stmtItem->bindValue(':mathang_id', $vItem['mathang_id'], PDO::PARAM_INT);
-                $stmtItem->bindValue(':soluong', $vItem['soluong'], PDO::PARAM_INT);
-                $stmtItem->bindValue(':dongianhap', $vItem['dongianhap']);
-                $stmtItem->bindValue(':thanhtien', $vItem['thanhtien']);
-                $stmtItem->bindValue(':ghichu', $vItem['ghichu']);
-                $stmtItem->execute();
+                $stmtItem->execute([
+                    ':phieunhap_id' => $receiptId,
+                    ':mathang_id'   => $vItem['mathang_id'],
+                    ':soluong'      => $vItem['soluong'],
+                    ':dongianhap'   => $vItem['dongianhap'],
+                    ':thanhtien'    => $vItem['thanhtien'],
+                    ':ghichu'       => $vItem['ghichu']
+                ]);
 
                 // Khóa dòng sản phẩm và cộng dồn tồn kho
-                $stmtLock->bindValue(':id', $vItem['mathang_id'], PDO::PARAM_INT);
-                $stmtLock->execute();
+                $stmtLock->execute([':id' => $vItem['mathang_id']]);
                 $product = $stmtLock->fetch();
 
                 if (!$product) {
                     throw new DomainException("Mặt hàng linh kiện ID {$vItem['mathang_id']} không tồn tại!");
                 }
 
-                $stmtUpdateProduct->bindValue(':soluong', $vItem['soluong'], PDO::PARAM_INT);
                 // Cập nhật giá gốc mới nhất nếu giá nhập > 0
                 $newGiaGoc = $vItem['dongianhap'] > 0 ? $vItem['dongianhap'] : $product['giagoc'];
-                $stmtUpdateProduct->bindValue(':giagoc', $newGiaGoc);
-                $stmtUpdateProduct->bindValue(':id', $vItem['mathang_id'], PDO::PARAM_INT);
-                $stmtUpdateProduct->execute();
+                $stmtUpdateProduct->execute([
+                    ':qty'    => $vItem['soluong'],
+                    ':giagoc' => $newGiaGoc,
+                    ':id'     => $vItem['mathang_id']
+                ]);
             }
 
             DatabaseService::commit();

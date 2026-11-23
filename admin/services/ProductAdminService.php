@@ -58,9 +58,11 @@ class ProductAdminService {
 
         // 1. Tìm kiếm từ khóa
         if (!empty($filters['search'])) {
-            $kw = trim($filters['search']);
-            $where[] = "(m.tenmathang LIKE :kw OR m.mota LIKE :kw OR m.dongmay LIKE :kw)";
-            $params[':kw'] = "%{$kw}%";
+            $kw = '%' . trim($filters['search']) . '%';
+            $where[] = "(m.tenmathang LIKE :search_name OR m.mota LIKE :search_desc OR m.dongmay LIKE :search_model)";
+            $params[':search_name'] = $kw;
+            $params[':search_desc'] = $kw;
+            $params[':search_model'] = $kw;
         }
 
         // 2. Lọc theo danh mục

@@ -35,9 +35,11 @@ class CustomerAdminService {
         }
 
         if (!empty($filters['search'])) {
-            $kw = trim($filters['search']);
-            $where[] = "(nd.hoten LIKE :kw OR nd.email LIKE :kw OR nd.sodienthoai LIKE :kw)";
-            $params[':kw'] = "%{$kw}%";
+            $kw = '%' . trim($filters['search']) . '%';
+            $where[] = "(nd.hoten LIKE :search_name OR nd.email LIKE :search_email OR nd.sodienthoai LIKE :search_phone)";
+            $params[':search_name'] = $kw;
+            $params[':search_email'] = $kw;
+            $params[':search_phone'] = $kw;
         }
 
         $whereClause = "WHERE " . implode(" AND ", $where);

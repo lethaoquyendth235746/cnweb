@@ -43,19 +43,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $ghichus = $_POST['ghichu_item'] ?? [];
 
         $items = [];
+        $seen = [];
         for ($i = 0; $i < count($mathangIds); $i++) {
             $mId = (int)($mathangIds[$i] ?? 0);
             $qty = (int)($soluongs[$i] ?? 0);
             $price = (float)($dongias[$i] ?? 0);
             $note = trim($ghichus[$i] ?? '');
 
-            if ($mId > 0 && $qty > 0) {
-                $items[] = [
-                    'mathang_id'  => $mId,
-                    'soluong'     => $qty,
-                    'dongianhap'  => $price,
-                    'ghichu'      => $note
-                ];
+            if ($mId > 0 && $qty > 0 && $price >= 0) {
+                if (isset($seen[$mId])) {
+                    // Tự động gộp số lượng nếu trùng mặt hàng
+                    $items[$seen[$mId]]['soluong'] += $qty;
+                } else {
+                    $seen[$mId] = count($items);
+                    $items[] = [
+                        'mathang_id'  => $mId,
+                        'soluong'     => $qty,
+                        'dongianhap'  => $price,
+                        'ghichu'      => $note
+                    ];
+                }
             }
         }
 
@@ -364,34 +371,37 @@ require_once __DIR__ . '/inc/layout_header.php';
      MODAL LẬP PHIẾU NHẬP KHO MỚI (NHIỀU DÒNG)
      ========================================== -->
 <div id="create-receipt-modal" class="modal-overlay modal-hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="modal-container bg-white w-full max-w-4xl rounded-3xl shadow-none border border-slate-100 overflow-hidden flex flex-col max-h-[92vh]">
+    <div class="modal-container bg-white w-full max-w-4xl rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[92vh]">
         
         <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
             <div>
-                <h3 class="text-base font-extrabold text-slate-900">Lập Phiếu Nhập Kho Linh Kiện Drone XAG</h3>
+                <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#B91C1C]"></span>
+                    <span>Lập Phiếu Nhập Kho Linh Kiện Drone XAG</span>
+                </h3>
                 <p class="text-xs text-slate-500 mt-0.5">Tự động tạo mã chứng từ 3NF và cộng dồn tồn kho vật lý</p>
             </div>
-            <button type="button" onclick="closeModal('create-receipt-modal')" class="p-2 text-slate-400 hover:text-slate-600 rounded-md hover:bg-slate-200 transition">
+            <button type="button" onclick="closeModal('create-receipt-modal')" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-200 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
 
-        <form action="inventory.php" method="POST" class="flex-1 overflow-y-auto p-6 space-y-5">
+        <form action="inventory.php" method="POST" id="create-receipt-form" onsubmit="return validateReceiptForm(event)" class="flex-1 overflow-y-auto p-6 space-y-5">
             <input type="hidden" name="action" value="create_receipt">
 
-            <!-- Thông tin chung chứng từ -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200/60">
+            <!-- Thông tin chung chứng từ: 3 ô thẳng hàng bằng nhau tuyệt đối chiều cao 40px -->
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Nhà cung cấp <span class="text-rose-500">*</span></label>
-                    <input type="text" name="nhacungcap" required placeholder="XAG Official / XAG Vietnam Corp" class="w-full text-xs px-3.5 py-2.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Nhà cung cấp <span class="text-[#B91C1C]">*</span></label>
+                    <input type="text" name="nhacungcap" required placeholder="XAG Official / XAG Vietnam Corp" class="w-full h-[40px] text-xs px-3.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#B91C1C]/20 focus:border-[#B91C1C] transition bg-white text-slate-800">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Ngày giờ nhập</label>
-                    <input type="datetime-local" name="ngaynhap" value="<?= date('Y-m-d\TH:i') ?>" class="w-full text-xs px-3.5 py-2.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Ngày giờ nhập</label>
+                    <input type="datetime-local" name="ngaynhap" value="<?= date('Y-m-d\TH:i') ?>" class="w-full h-[40px] text-xs px-3.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#B91C1C]/20 focus:border-[#B91C1C] transition bg-white text-slate-800">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Ghi chú chứng từ / Vận đơn</label>
-                    <input type="text" name="ghichu" placeholder="Nhập lô bảo hành đợt 1 / Bay vụ hè thu" class="w-full text-xs px-3.5 py-2.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Ghi chú chứng từ / Vận đơn</label>
+                    <input type="text" name="ghichu" placeholder="Nhập lô bảo hành đợt 1 / Bay vụ hè thu" class="w-full h-[40px] text-xs px-3.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#B91C1C]/20 focus:border-[#B91C1C] transition bg-white text-slate-800">
                 </div>
             </div>
 
@@ -399,48 +409,48 @@ require_once __DIR__ . '/inc/layout_header.php';
             <div>
                 <div class="flex items-center justify-between mb-2">
                     <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Chi tiết các mặt hàng nhập</h4>
-                    <button type="button" onclick="addReceiptRow()" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold rounded-md transition border border-red-200">
+                    <button type="button" onclick="addReceiptRow()" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-[#B91C1C] text-xs font-bold rounded-lg transition border border-red-200">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         <span>Thêm dòng linh kiện</span>
                     </button>
                 </div>
 
-                <div class="border border-slate-200 rounded-2xl overflow-hidden">
-                    <table id="receipt-items-table" class="w-full text-left text-xs">
-                        <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                <div class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                    <table id="receipt-items-table" class="w-full text-left text-xs border-collapse">
+                        <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
                             <tr>
-                                <th class="py-2.5 px-3 w-5/12">Chọn linh kiện XAG</th>
-                                <th class="py-2.5 px-3 w-2/12 text-center">Số lượng</th>
-                                <th class="py-2.5 px-3 w-2/12 text-right">Đơn giá nhập</th>
-                                <th class="py-2.5 px-3 w-2/12 text-right">Thành tiền</th>
-                                <th class="py-2.5 px-3 w-1/12 text-center">Xóa</th>
+                                <th class="py-2.5 px-3" style="width: 42%;">Linh kiện XAG</th>
+                                <th class="py-2.5 px-3 text-center" style="width: 14%;">Số lượng</th>
+                                <th class="py-2.5 px-3 text-right" style="width: 20%;">Đơn giá nhập</th>
+                                <th class="py-2.5 px-3 text-right" style="width: 18%;">Thành tiền</th>
+                                <th class="py-2.5 px-3 text-center" style="width: 6%;">Xóa</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
                             <!-- Dòng mẫu mặc định -->
                             <tr class="receipt-row">
-                                <td class="py-2.5 px-3">
-                                    <select name="mathang_id[]" required onchange="onProductSelectChange(this)" class="w-full text-xs px-2.5 py-2 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+                                <td class="py-2.5 px-3 align-middle" style="width: 42%;">
+                                    <select name="mathang_id[]" required onchange="onProductSelectChange(this)" class="w-full h-[38px] text-xs px-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#B91C1C]/20 focus:border-[#B91C1C] transition bg-white text-slate-800">
                                         <option value="">-- Chọn mặt hàng --</option>
                                         <?php foreach ($allProducts as $p): ?>
-                                            <option value="<?= (int)$p['id'] ?>" data-price="<?= (float)$p['giagoc'] ?>">
+                                            <option value="<?= (int)$p['id'] ?>" data-giavon="<?= (float)$p['giagoc'] ?>" data-price="<?= (float)$p['giagoc'] ?>">
                                                 <?= htmlspecialchars($p['tenmathang']) ?> (<?= htmlspecialchars($p['dongmay'] ?: 'Dùng chung') ?>)
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <input type="text" name="ghichu_item[]" placeholder="Mã lô / Serial..." class="w-full mt-1.5 text-[11px] px-2 py-1 rounded-lg border border-slate-200">
+                                    <input type="text" name="ghichu_item[]" placeholder="Mã lô / Serial..." class="w-full mt-[6px] text-[11px] h-[28px] px-2.5 rounded-md border border-slate-200 bg-slate-50 text-slate-600 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#B91C1C]/30 focus:border-[#B91C1C] transition">
                                 </td>
-                                <td class="py-2.5 px-3">
-                                    <input type="number" name="soluong[]" min="1" value="1" required oninput="recalculateReceiptTotal()" class="item-qty w-full text-center text-xs font-bold px-2 py-2 rounded-md border border-slate-300">
+                                <td class="py-2.5 px-3 align-middle" style="width: 14%;">
+                                    <input type="number" name="soluong[]" min="1" value="1" required oninput="recalculateReceiptTotal()" class="item-qty w-full h-[38px] text-center text-xs font-bold px-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#B91C1C]/20 focus:border-[#B91C1C] transition bg-white text-slate-800">
                                 </td>
-                                <td class="py-2.5 px-3">
-                                    <input type="number" name="dongianhap[]" min="0" step="1000" value="0" required oninput="recalculateReceiptTotal()" class="item-price w-full text-right text-xs font-mono-num px-2 py-2 rounded-md border border-slate-300">
+                                <td class="py-2.5 px-3 align-middle" style="width: 20%;">
+                                    <input type="number" name="dongianhap[]" min="0" step="1000" value="0" required oninput="recalculateReceiptTotal()" class="item-price w-full h-[38px] text-right text-xs font-mono-num px-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#B91C1C]/20 focus:border-[#B91C1C] transition bg-white text-slate-800">
                                 </td>
-                                <td class="py-2.5 px-3 text-right font-bold text-slate-800 font-mono-num item-subtotal">
+                                <td class="py-2.5 px-3 text-right font-bold text-slate-800 font-mono-num item-subtotal text-xs align-middle" style="width: 18%;">
                                     0 đ
                                 </td>
-                                <td class="py-2.5 px-3 text-center">
-                                    <button type="button" onclick="removeReceiptRow(this)" class="p-1 text-slate-400 hover:text-rose-500 transition">
+                                <td class="py-2.5 px-3 text-center align-middle" style="width: 6%;">
+                                    <button type="button" onclick="removeReceiptRow(this)" class="p-1.5 text-slate-400 hover:text-[#B91C1C] rounded-md hover:bg-red-50 transition" title="Xóa dòng này">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                     </button>
                                 </td>
@@ -448,8 +458,8 @@ require_once __DIR__ . '/inc/layout_header.php';
                         </tbody>
                         <tfoot class="bg-slate-50 font-bold border-t border-slate-200">
                             <tr>
-                                <td colspan="3" class="py-3 px-3 text-right text-slate-700">Tổng tiền thanh toán phiếu nhập:</td>
-                                <td id="receipt-grand-total" class="py-3 px-3 text-right text-base text-red-600 font-mono-num font-black">0 đ</td>
+                                <td colspan="3" class="py-3 px-3 text-right text-xs font-bold text-slate-700">Tổng tiền thanh toán phiếu nhập:</td>
+                                <td id="receipt-grand-total" class="py-3 px-3 text-right text-sm sm:text-base text-[#B91C1C] font-mono-num font-extrabold whitespace-nowrap">0 đ</td>
                                 <td></td>
                             </tr>
                         </tfoot>
@@ -458,11 +468,12 @@ require_once __DIR__ . '/inc/layout_header.php';
             </div>
 
             <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
-                <button type="button" onclick="closeModal('create-receipt-modal')" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-md transition">
+                <button type="button" onclick="closeModal('create-receipt-modal')" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition border border-slate-200">
                     Hủy bỏ
                 </button>
-                <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold text-xs rounded-md transition shadow-none shadow-none/25">
-                    Lưu & Nhập kho ngay
+                <button type="submit" class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-[#B91C1C] hover:bg-[#991B1B] text-white font-bold text-xs rounded-lg transition shadow-sm hover:shadow active:scale-[0.99]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>Lưu & Nhập kho ngay</span>
                 </button>
             </div>
         </form>
@@ -547,6 +558,11 @@ require_once __DIR__ . '/inc/layout_header.php';
 </div>
 
 <script>
+function formatVND(amount) {
+    const num = Math.round(Number(amount) || 0);
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " đ";
+}
+
 function openCreateReceiptModal() {
     openModal('create-receipt-modal');
     recalculateReceiptTotal();
@@ -554,13 +570,60 @@ function openCreateReceiptModal() {
 
 function onProductSelectChange(select) {
     const selectedOption = select.options[select.selectedIndex];
-    const defaultPrice = selectedOption.getAttribute('data-price') || 0;
+    const defaultPrice = parseFloat(selectedOption.getAttribute('data-giavon') || selectedOption.getAttribute('data-price') || 0);
     const row = select.closest('tr');
     const priceInput = row.querySelector('.item-price');
-    if (priceInput && defaultPrice > 0) {
-        priceInput.value = defaultPrice;
+    if (priceInput) {
+        const curPrice = parseFloat(priceInput.value) || 0;
+        if (curPrice === 0 && defaultPrice > 0) {
+            priceInput.value = defaultPrice;
+        }
     }
+    checkDuplicateProduct(select);
     recalculateReceiptTotal();
+}
+
+function checkDuplicateProduct(currentSelect) {
+    const currentVal = currentSelect.value;
+    if (!currentVal) return;
+
+    const allSelects = document.querySelectorAll('#receipt-items-table tbody tr.receipt-row select[name="mathang_id[]"]');
+    let duplicateRow = null;
+
+    allSelects.forEach(sel => {
+        if (sel !== currentSelect && sel.value === currentVal) {
+            duplicateRow = sel.closest('tr');
+        }
+    });
+
+    if (duplicateRow) {
+        const prodName = currentSelect.options[currentSelect.selectedIndex].text.trim();
+        const shouldMerge = confirm(
+            `Linh kiện "${prodName}" đã có trong danh sách nhập kho!\n\n` +
+            `Bạn có muốn GỘP số lượng vào dòng đã có không?\n` +
+            `- Bấm "OK" để gộp số lượng.\n` +
+            `- Bấm "Cancel" để chọn mặt hàng khác.`
+        );
+
+        if (shouldMerge) {
+            const currentQty = parseInt(currentSelect.closest('tr').querySelector('.item-qty').value) || 1;
+            const targetQtyInput = duplicateRow.querySelector('.item-qty');
+            targetQtyInput.value = (parseInt(targetQtyInput.value) || 0) + currentQty;
+
+            const rows = document.querySelectorAll('#receipt-items-table tbody tr.receipt-row');
+            if (rows.length > 1) {
+                currentSelect.closest('tr').remove();
+            } else {
+                currentSelect.value = '';
+                const pInput = currentSelect.closest('tr').querySelector('.item-price');
+                if (pInput) pInput.value = 0;
+            }
+        } else {
+            currentSelect.value = '';
+            const pInput = currentSelect.closest('tr').querySelector('.item-price');
+            if (pInput) pInput.value = 0;
+        }
+    }
 }
 
 function addReceiptRow() {
@@ -598,12 +661,93 @@ function recalculateReceiptTotal() {
     rows.forEach(row => {
         const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
         const price = parseFloat(row.querySelector('.item-price').value) || 0;
-        const subtotal = qty * price;
+        const subtotal = Math.round(qty * price);
         grandTotal += subtotal;
-        row.querySelector('.item-subtotal').textContent = new Intl.NumberFormat('vi-VN').format(subtotal) + ' đ';
+        const subtotalEl = row.querySelector('.item-subtotal');
+        if (subtotalEl) {
+            subtotalEl.textContent = formatVND(subtotal);
+        }
     });
 
-    document.getElementById('receipt-grand-total').textContent = new Intl.NumberFormat('vi-VN').format(grandTotal) + ' đ';
+    const grandTotalEl = document.getElementById('receipt-grand-total');
+    if (grandTotalEl) {
+        grandTotalEl.textContent = formatVND(grandTotal);
+    }
+}
+
+// Aliases
+const recalcReceiptTotal = recalculateReceiptTotal;
+const updateRowTotal = recalculateReceiptTotal;
+
+function validateReceiptForm(e) {
+    const nccInput = document.querySelector('input[name="nhacungcap"]');
+    if (!nccInput || !nccInput.value.trim()) {
+        alert('Vui lòng nhập tên Nhà cung cấp / đơn vị phân phối.');
+        if (nccInput) nccInput.focus();
+        if (e && e.preventDefault) e.preventDefault();
+        return false;
+    }
+
+    const rows = document.querySelectorAll('#receipt-items-table tbody tr.receipt-row');
+    if (rows.length === 0) {
+        alert('Phiếu nhập kho phải chứa ít nhất một dòng linh kiện.');
+        if (e && e.preventDefault) e.preventDefault();
+        return false;
+    }
+
+    let hasValidItem = false;
+    const selectedIds = new Set();
+
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const select = row.querySelector('select[name="mathang_id[]"]');
+        const qtyInput = row.querySelector('.item-qty');
+        const priceInput = row.querySelector('.item-price');
+
+        const mId = select ? select.value : '';
+        const qty = parseInt(qtyInput ? qtyInput.value : 0) || 0;
+        const price = parseFloat(priceInput ? priceInput.value : 0) || 0;
+
+        if (!mId) {
+            alert(`Dòng số ${i + 1}: Vui lòng chọn linh kiện XAG hoặc xóa dòng này.`);
+            if (select) select.focus();
+            if (e && e.preventDefault) e.preventDefault();
+            return false;
+        }
+
+        if (selectedIds.has(mId)) {
+            const prodName = select.options[select.selectedIndex].text.trim();
+            alert(`Linh kiện "${prodName}" bị trùng lặp ở dòng số ${i + 1}. Vui lòng gộp số lượng hoặc xóa dòng trùng.`);
+            select.focus();
+            if (e && e.preventDefault) e.preventDefault();
+            return false;
+        }
+        selectedIds.add(mId);
+
+        if (qty < 1) {
+            alert(`Dòng số ${i + 1}: Số lượng nhập phải lớn hơn hoặc bằng 1.`);
+            if (qtyInput) qtyInput.focus();
+            if (e && e.preventDefault) e.preventDefault();
+            return false;
+        }
+
+        if (price < 0) {
+            alert(`Dòng số ${i + 1}: Đơn giá nhập không được nhỏ hơn 0.`);
+            if (priceInput) priceInput.focus();
+            if (e && e.preventDefault) e.preventDefault();
+            return false;
+        }
+
+        hasValidItem = true;
+    }
+
+    if (!hasValidItem) {
+        alert('Vui lòng chọn ít nhất 1 mặt hàng linh kiện hợp lệ để nhập kho.');
+        if (e && e.preventDefault) e.preventDefault();
+        return false;
+    }
+
+    return true;
 }
 
 function showReceiptDetail(rc) {
