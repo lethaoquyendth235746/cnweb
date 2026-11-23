@@ -70,7 +70,61 @@ if (!function_exists('render_order_status_badge')) {
 
                 <div class="small text-secondary mb-3">
                     <div class="mb-2"><strong class="text-dark">Email:</strong> <?php echo htmlspecialchars($_SESSION["khachhang"]["email"]); ?></div>
-                    <div><strong class="text-dark">Số điện thoại:</strong> <?php echo htmlspecialchars($_SESSION["khachhang"]["sodienthoai"]); ?></div>
+                    <div class="mb-2"><strong class="text-dark">Số điện thoại:</strong> <?php echo htmlspecialchars($_SESSION["khachhang"]["sodienthoai"] ?? "Chưa có"); ?></div>
+                    <div><strong class="text-dark">Địa chỉ:</strong> <?php echo htmlspecialchars($diachi_macdinh["diachi"] ?? "Chưa cập nhật"); ?></div>
+                </div>
+
+                <div class="d-flex gap-2 mb-3">
+                    <button class="btn btn-outline-secondary btn-sm flex-grow-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHoSo" aria-expanded="false">
+                        <i class="bi bi-pencil-square me-1"></i> Sửa hồ sơ
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm flex-grow-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDoiMK" aria-expanded="false">
+                        <i class="bi bi-key me-1"></i> Đổi mật khẩu
+                    </button>
+                </div>
+
+                <!-- Form sửa hồ sơ (Collapse) -->
+                <div class="collapse mb-3" id="collapseHoSo">
+                    <div class="p-3 bg-light rounded border">
+                        <h6 class="fw-bold text-dark small mb-2">Cập nhật hồ sơ</h6>
+                        <form method="post" action="index.php?action=capnhathoso">
+                            <div class="mb-2">
+                                <label class="form-label small text-secondary mb-1">Họ và tên:</label>
+                                <input type="text" name="txthoten" class="form-control form-control-sm" value="<?php echo htmlspecialchars($_SESSION["khachhang"]["hoten"]); ?>" required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small text-secondary mb-1">Số điện thoại (10 số):</label>
+                                <input type="tel" name="txtsodienthoai" pattern="[0-9]{10}" maxlength="10" class="form-control form-control-sm" value="<?php echo htmlspecialchars($_SESSION["khachhang"]["sodienthoai"] ?? ""); ?>" required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small text-secondary mb-1">Địa chỉ giao hàng:</label>
+                                <textarea name="txtdiachi" rows="2" class="form-control form-control-sm" placeholder="Nhập địa chỉ nhận hàng"><?php echo htmlspecialchars($diachi_macdinh["diachi"] ?? ""); ?></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-danger btn-sm w-100">Lưu thông tin</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Form đổi mật khẩu (Collapse) -->
+                <div class="collapse mb-3" id="collapseDoiMK">
+                    <div class="p-3 bg-light rounded border">
+                        <h6 class="fw-bold text-dark small mb-2">Đổi mật khẩu tài khoản</h6>
+                        <form method="post" action="index.php?action=doimatkhau">
+                            <div class="mb-2">
+                                <label class="form-label small text-secondary mb-1">Mật khẩu hiện tại:</label>
+                                <input type="password" name="txtmatkhau_cu" class="form-control form-control-sm" placeholder="Mật khẩu đang dùng" required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small text-secondary mb-1">Mật khẩu mới (>= 6 ký tự):</label>
+                                <input type="password" name="txtmatkhau_moi" minlength="6" class="form-control form-control-sm" placeholder="Mật khẩu mới" required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small text-secondary mb-1">Xác nhận mật khẩu mới:</label>
+                                <input type="password" name="txtmatkhau_xacnhan" minlength="6" class="form-control form-control-sm" placeholder="Nhập lại mật khẩu mới" required>
+                            </div>
+                            <button type="submit" class="btn btn-dark btn-sm w-100">Cập nhật mật khẩu</button>
+                        </form>
+                    </div>
                 </div>
 
                 <div class="p-3 bg-light rounded border mb-3 small text-secondary">
@@ -130,10 +184,29 @@ if (!function_exists('render_order_status_badge')) {
                                 <td class="small text-nowrap"><?php echo date("d/m/Y H:i", strtotime($d["ngay"])); ?></td>
                                 <td class="text-center">
                                     <?php echo render_order_status_badge($status); ?>
+                                    <?php if(($d["phuongthucthanhtoan"] ?? '') === 'VIETQR'): ?>
+                                    <div class="mt-1">
+                                        <?php if((int)($d["trangthaithanhtoan"] ?? 0) === 1): ?>
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 10px;"><i class="bi bi-check-circle me-1"></i>Đã thanh toán</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-warning-subtle text-dark border border-warning-subtle" style="font-size: 10px;"><i class="bi bi-clock-history me-1"></i>Chờ chuyển khoản</span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <?php else: ?>
+                                    <div class="mt-1">
+                                        <span class="badge bg-light text-secondary border" style="font-size: 10px;">COD</span>
+                                    </div>
+                                    <?php endif; ?>
                                 </td>
                                 <td class="text-end fw-bold text-dark text-nowrap"><?php echo number_format($d["tongtien"]); ?> đ</td>
                                 <td class="text-center text-nowrap">
                                     <div class="d-flex justify-content-center align-items-center gap-1">
+                                        <?php if(($d["phuongthucthanhtoan"] ?? '') === 'VIETQR' && (int)($d["trangthaithanhtoan"] ?? 0) === 0 && $status === 0): ?>
+                                        <a href="index.php?action=thanhtoan_vietqr&dhid=<?php echo $d["id"]; ?>" class="btn btn-danger btn-sm text-nowrap" style="background-color: #B91C1C; border-color: #B91C1C;" title="Quét mã thanh toán VietQR">
+                                            <i class="bi bi-qr-code-scan me-1"></i> Thanh toán
+                                        </a>
+                                        <?php endif; ?>
+
                                         <a href="index.php?action=thongtin&dhid=<?php echo $d["id"]; ?>" class="btn btn-outline-secondary btn-sm" title="Xem chi tiết đơn">
                                             Chi tiết
                                         </a>
@@ -178,7 +251,7 @@ if (!function_exists('render_order_status_badge')) {
                                                 <tr>
                                                     <td>
                                                         <a href="index.php?action=detail&id=<?php echo $dhct["id"]; ?>" class="text-dark small text-decoration-none d-flex align-items-center">
-                                                            <img src="../<?php echo htmlspecialchars($dhct["hinhanh"]); ?>" width="32" height="32" class="rounded border me-2" style="object-fit: cover;">
+                                                            <img src="<?php echo lay_hinhanh_mathang($dhct["hinhanh"] ?? ""); ?>" width="32" height="32" class="rounded border me-2" style="object-fit: cover;">
                                                             <span><?php echo htmlspecialchars($dhct["tenmathang"]); ?></span>
                                                         </a>
                                                     </td>

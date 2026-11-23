@@ -2,13 +2,14 @@
 class DIACHI{
 	
 	// Thêm địa chỉ mới, trả về khóa của dòng mới thêm
-	public function themdiachi($nguoidung_id,$diachi){
+	public function themdiachi($nguoidung_id,$diachi, $macdinh = 1){
 		$db = DATABASE::connect();
 		try{
-			$sql = "INSERT INTO diachi(nguoidung_id, diachi) VALUES(:nguoidung_id,:diachi)";
+			$sql = "INSERT INTO diachi(nguoidung_id, diachi, macdinh) VALUES(:nguoidung_id, :diachi, :macdinh)";
 			$cmd = $db->prepare($sql);
 			$cmd->bindValue(':nguoidung_id',$nguoidung_id);			
 			$cmd->bindValue(':diachi',$diachi);			
+			$cmd->bindValue(':macdinh',$macdinh);			
 			$cmd->execute();
 			$id = $db->lastInsertId();
 			return $id;
@@ -24,7 +25,7 @@ class DIACHI{
     public function laydiachikhachhang($id){
         $dbcon = DATABASE::connect();
         try{
-            $sql = "SELECT * FROM diachi WHERE nguoidung_id=:id AND macdinh=1 LIMIT 1";
+            $sql = "SELECT * FROM diachi WHERE nguoidung_id=:id ORDER BY macdinh DESC, id DESC LIMIT 1";
             $cmd = $dbcon->prepare($sql);
             $cmd->bindValue(":id", $id);
             $cmd->execute();

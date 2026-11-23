@@ -63,6 +63,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: {$redirectUrl}");
         exit;
     }
+
+    if ($action === 'confirm_payment') {
+        $orderId = (int)($_POST['order_id'] ?? 0);
+        $adminNote = trim($_POST['admin_note'] ?? '');
+
+        try {
+            $orderService->confirmVietQRPayment($orderId, $adminNote);
+            setAdminFlash('success', "Đã xác nhận thanh toán VietQR cho đơn hàng #{$orderId} thành công! Đơn hàng đã được chuyển sang trạng thái Đã xác nhận.");
+        } catch (Throwable $e) {
+            setAdminFlash('danger', 'Lỗi xác nhận thanh toán: ' . $e->getMessage());
+        }
+
+        $redirectUrl = 'orders.php';
+        $params = [];
+        if (isset($_POST['return_trangthai']) && $_POST['return_trangthai'] !== '') {
+            $params['trangthai'] = $_POST['return_trangthai'];
+        }
+        if (!empty($_POST['return_search'])) {
+            $params['search'] = $_POST['return_search'];
+        }
+        if (!empty($params)) {
+            $redirectUrl .= '?' . http_build_query($params);
+        }
+
+        header("Location: {$redirectUrl}");
+        exit;
+    }
 }
 
 // ==========================================
@@ -238,6 +265,7 @@ require_once __DIR__ . '/inc/layout_header.php';
                     <tr>
                         <th class="py-3.5 px-4">Mã đơn</th>
                         <th class="py-3.5 px-4">Khách hàng & Liên hệ</th>
+                        <th class="py-3.5 px-4">Thanh toán</th>
                         <th class="py-3.5 px-4">Ngày tạo đơn</th>
                         <th class="py-3.5 px-4 text-right">Tổng tiền</th>
                         <th class="py-3.5 px-4 text-center">Trạng thái</th>
@@ -247,7 +275,7 @@ require_once __DIR__ . '/inc/layout_header.php';
                 <tbody class="divide-y divide-slate-100">
                     <?php if (empty($orders)): ?>
                         <tr>
-                            <td colspan="6" class="py-12 text-center text-slate-400">
+                            <td colspan="7" class="py-12 text-center text-slate-400">
                                 <div class="flex flex-col items-center">
                                     <svg class="w-10 h-10 text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                                     <p class="font-medium text-slate-600">Không tìm thấy đơn hàng nào khớp với điều kiện lọc.</p>
@@ -258,6 +286,8 @@ require_once __DIR__ . '/inc/layout_header.php';
                     <?php else: ?>
                         <?php foreach ($orders as $od): 
                             $stMeta = getOrderStatusMeta($od['trangthai']);
+                            $isVietQR = (($od['phuongthucthanhtoan'] ?? 'COD') === 'VIETQR');
+                            $isPaid = ((int)($od['trangthaithanhtoan'] ?? 0) === 1);
                         ?>
                             <tr class="table-hover-row transition-colors">
                                 <td class="py-3.5 px-4 font-mono font-bold text-slate-900">
@@ -278,6 +308,32 @@ require_once __DIR__ . '/inc/layout_header.php';
                                         </div>
                                     <?php endif; ?>
                                 </td>
+                                <td class="py-3.5 px-4 whitespace-nowrap">
+                                    <div class="flex flex-col gap-1 items-start">
+                                        <?php if ($isVietQR): ?>
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                                <svg class="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                                                VietQR
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                                                💵 COD
+                                            </span>
+                                        <?php endif; ?>
+
+                                        <?php if ($isPaid): ?>
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                Đã thanh toán
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                                Chưa thanh toán
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
                                 <td class="py-3.5 px-4 text-slate-600 font-mono-num whitespace-nowrap">
                                     <?= formatDateVN($od['ngay'], true) ?>
                                 </td>
@@ -291,10 +347,25 @@ require_once __DIR__ . '/inc/layout_header.php';
                                     </span>
                                 </td>
                                 <td class="py-3.5 px-4 text-right whitespace-nowrap">
-                                    <button type="button" onclick="openOrderDetail(<?= (int)$od['id'] ?>)" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 rounded-md font-bold transition shadow-none">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                        <span>Xử lý đơn</span>
-                                    </button>
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <?php if ($isVietQR && !$isPaid && (int)$od['trangthai'] !== 4): ?>
+                                            <form method="post" action="orders.php" class="inline m-0" onsubmit="return confirm('Xác nhận đã nhận tiền chuyển khoản cho đơn hàng #<?= (int)$od['id'] ?>? Trạng thái đơn sẽ được tự động chuyển sang Đã xác nhận.');">
+                                                <input type="hidden" name="action" value="confirm_payment">
+                                                <input type="hidden" name="order_id" value="<?= (int)$od['id'] ?>">
+                                                <input type="hidden" name="return_trangthai" value="<?= htmlspecialchars((string)($selectedStatus ?? '')) ?>">
+                                                <input type="hidden" name="return_search" value="<?= htmlspecialchars($search) ?>">
+                                                <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md font-bold text-xs transition" title="Xác nhận nhận tiền QR">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                    <span>Nhận tiền QR</span>
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+
+                                        <button type="button" onclick="openOrderDetail(<?= (int)$od['id'] ?>)" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 rounded-md font-bold transition shadow-none">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                            <span>Xử lý đơn</span>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -363,6 +434,9 @@ require_once __DIR__ . '/inc/layout_header.php';
                     <p id="modal-order-note" class="text-amber-800 bg-amber-50 p-2 rounded-lg mt-2 border border-amber-200">Ghi chú: Không có</p>
                 </div>
             </div>
+
+            <!-- Khối thông tin Phương thức & Trạng thái thanh toán -->
+            <div id="modal-payment-section"></div>
 
             <!-- Bảng danh sách linh kiện trong đơn -->
             <div>
@@ -474,6 +548,69 @@ function openOrderDetail(orderId) {
             document.getElementById('modal-customer-address').textContent = ord.diachi_chitiet || 'Địa chỉ chưa cập nhật';
             document.getElementById('modal-order-note').textContent = 'Ghi chú đặt hàng: ' + (ord.ghichu || 'Không có ghi chú');
             document.getElementById('modal-order-grand-total').textContent = ord.tongtien_fmt;
+
+            // Render khối Phương thức & Trạng thái thanh toán
+            const isVietQR = (ord.phuongthucthanhtoan === 'VIETQR');
+            const isPaid = (parseInt(ord.trangthaithanhtoan, 10) === 1);
+            const paymentBox = document.getElementById('modal-payment-section');
+
+            if (isVietQR) {
+                if (isPaid) {
+                    paymentBox.innerHTML = `
+                        <div class="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200 flex items-center justify-between">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-sm">✓</div>
+                                <div>
+                                    <div class="text-xs font-bold text-emerald-900">Chuyển khoản VietQR 24/7 • ĐÃ THANH TOÁN</div>
+                                    <div class="text-[11px] text-emerald-700">Đơn hàng đã được xác nhận nhận tiền thành công vào tài khoản MB Bank.</div>
+                                </div>
+                            </div>
+                            <span class="px-2.5 py-1 bg-emerald-600 text-white font-bold text-xs rounded-md">Đã thanh toán</span>
+                        </div>
+                    `;
+                } else {
+                    const retStatus = <?= json_encode((string)($selectedStatus ?? '')) ?>;
+                    const retSearch = <?= json_encode($search) ?>;
+                    paymentBox.innerHTML = `
+                        <div class="p-3.5 bg-amber-50 rounded-2xl border border-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-sm">!</div>
+                                <div>
+                                    <div class="text-xs font-bold text-amber-900 flex items-center gap-2">
+                                        <span>Chuyển khoản VietQR 24/7 • CHƯA XÁC NHẬN NHẬN TIỀN</span>
+                                    </div>
+                                    <div class="text-[11px] text-amber-800">
+                                        Nội dung CK: <strong class="font-mono text-red-700">LPTDH${ord.id}</strong> | Số tiền: <strong class="text-slate-900 font-mono-num">${ord.tongtien_fmt}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <form method="post" action="orders.php" class="m-0" onsubmit="return confirm('Xác nhận đã nhận tiền chuyển khoản cho đơn hàng #' + ord.id + '? Trạng thái đơn sẽ được tự động chuyển sang Đã xác nhận.');">
+                                <input type="hidden" name="action" value="confirm_payment">
+                                <input type="hidden" name="order_id" value="${ord.id}">
+                                <input type="hidden" name="return_trangthai" value="${retStatus}">
+                                <input type="hidden" name="return_search" value="${retSearch}">
+                                <button type="submit" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-md shadow-none flex items-center gap-1.5 transition whitespace-nowrap">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span>Xác nhận đã nhận tiền QR</span>
+                                </button>
+                            </form>
+                        </div>
+                    `;
+                }
+            } else {
+                paymentBox.innerHTML = `
+                    <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="text-base">💵</span>
+                            <div>
+                                <span class="text-xs font-bold text-slate-800">Thanh toán tiền mặt khi nhận hàng (COD)</span>
+                                <div class="text-[11px] text-slate-500">Bưu tá hoặc nhà xe sẽ thu tiền mặt khi giao hàng.</div>
+                            </div>
+                        </div>
+                        <span class="px-2 py-0.5 bg-slate-200 text-slate-700 font-medium text-xs rounded">COD</span>
+                    </div>
+                `;
+            }
 
             // Render danh sách items
             const tbody = document.getElementById('modal-order-items-tbody');

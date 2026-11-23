@@ -1,71 +1,74 @@
 <?php 
 /**
  * admin/ktnguoidung/index.php
- * Controller Đ�fng nhập & Xác thực Quản tr�< - Tương thích ngược Giai �'oạn 3
+ * Controller Đăng nhập & Xác thực Quản trị viên & Nhân viên (loai = 1, 2)
  */
 
-if (session_status() == PHP_SESSION_NONE) {
+if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-require("../../model/database.php");
-require("../../model/nguoidung.php");
 
-// Biến $isLogin cho biết người dùng �'�fng nhập chưa
-$isLogin = isset($_SESSION["nguoidung"]);
+require_once __DIR__ . "/../../model/database.php";
+require_once __DIR__ . "/../../model/nguoidung.php";
+require_once __DIR__ . "/../includes/auth_middleware.php";
 
-// Xét xem có thao tác nào �'ược chọn
-if (isset($_REQUEST["action"])) {
-    $action = $_REQUEST["action"];
-} elseif ($isLogin == FALSE) {  // chưa �'�fng nhập
-    $action = "dangnhap";
-} else {   // mặc �'�<nh
-    $action = "macdinh";
-}
+$action = $_REQUEST["action"] ?? (isAuthenticated() ? "macdinh" : "dangnhap");
 
 $nd = new NGUOIDUNG();
 
 switch ($action) {
     case "macdinh":               
-        // Chuy�fn hư�>ng sang Bảng �'iều khi�fn hi�?n �'ại
         header("Location: ../index.php");
         exit;
         break;
+
     case "dangnhap":
-        include("login.php");
+        if (isAuthenticated()) {
+            header("Location: ../index.php");
+            exit;
+        }
+        header("Location: ../../public/index.php?action=dangnhap");
+        exit;
         break;
+
     case "xldangnhap":
-        $email = $_REQUEST["txtemail"];
-        $matkhau = $_REQUEST["txtmatkhau"];
-        if ($nd->kiemtranguoidunghople($email, $matkhau) == TRUE) {
-            $_SESSION["nguoidung"] = $nd->laythongtinnguoidung($email); // �'ặt biến session
-            // Đ�fng nhập thành công -> chuy�fn thẳng t�>i Dashboard m�>i
+        $email = trim($_POST["txtemail"] ?? "");
+        $matkhau = trim($_POST["txtmatkhau"] ?? "");
+
+        // Chỉ cho phép loai = 1 (SuperAdmin) và loai = 2 (Nhân viên / Kỹ thuật viên)
+        $auth = $nd->authenticate($email, $matkhau, [1, 2]);
+
+        if ($auth['success']) {
+            session_regenerate_id(true);
+            $_SESSION['admin'] = $auth['user'];
+            $_SESSION['nguoidung'] = $auth['user'];
+
+            // Điều hướng thẳng vào Dashboard quản trị
             header("Location: ../index.php");
             exit;
         } else {
-            include("login.php");
+            $_SESSION['tb_loi_dn'] = $auth['message'];
+            header("Location: ../../public/index.php?action=dangnhap");
+            exit;
         }
         break;
+
     case "dangxuat":
-        unset($_SESSION["nguoidung"]);  // hủy biến session
-        header("Location: ../../public/index.php"); // chuy�fn hư�>ng ra trang chủ khách
+        // Xóa sạch session quản trị
+        unset($_SESSION["admin"], $_SESSION["nguoidung"]);
+        header("Location: ../../public/index.php?action=dangnhap");
         exit;
         break;  
+
     case "hoso":               
-        header("Location: ../profile.php");
-        exit;
-        break; 
     case "xlhoso":
-        header("Location: ../profile.php");
-        exit;
-        break;
     case "doimatkhau":
         header("Location: ../profile.php");
         exit;
         break;
+
     default:
         header("Location: ../index.php");
         exit;
         break;
 }
-?>
-

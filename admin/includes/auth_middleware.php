@@ -2,7 +2,7 @@
 /**
  * admin/includes/auth_middleware.php
  * Middleware Kiểm tra Đăng nhập, Phân quyền RBAC & Quản lý Flash Message
- * Hệ thống Quản trị XAG Store - Giai đoạn 2
+ * Hệ thống Quản trị XAG Store - Giai đoạn 2 & Chuẩn hóa Phân quyền
  */
 
 if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
@@ -11,19 +11,36 @@ if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
 
 if (!function_exists('isAuthenticated')) {
     /**
-     * Kiểm tra người dùng đã đăng nhập chưa
+     * Kiểm tra người dùng Quản trị / Nhân viên đã đăng nhập chưa
      */
     function isAuthenticated(): bool {
-        return isset($_SESSION['nguoidung']) && !empty($_SESSION['nguoidung']['id']);
+        if (isset($_SESSION['admin']) && !empty($_SESSION['admin']['id'])) {
+            return true;
+        }
+        // Tương thích ngược nếu tồn tại $_SESSION['nguoidung'] có quyền quản trị
+        if (isset($_SESSION['nguoidung']) && !empty($_SESSION['nguoidung']['id'])) {
+            $loai = (int)($_SESSION['nguoidung']['loai'] ?? 0);
+            return ($loai === 1 || $loai === 2);
+        }
+        return false;
     }
 }
 
 if (!function_exists('getCurrentUser')) {
     /**
-     * Lấy thông tin người dùng đang đăng nhập trong Session
+     * Lấy thông tin người dùng đang đăng nhập trong Session Quản trị
      */
     function getCurrentUser(): ?array {
-        return $_SESSION['nguoidung'] ?? null;
+        if (isset($_SESSION['admin']) && !empty($_SESSION['admin']['id'])) {
+            return $_SESSION['admin'];
+        }
+        if (isset($_SESSION['nguoidung']) && !empty($_SESSION['nguoidung']['id'])) {
+            $loai = (int)($_SESSION['nguoidung']['loai'] ?? 0);
+            if ($loai === 1 || $loai === 2) {
+                return $_SESSION['nguoidung'];
+            }
+        }
+        return null;
     }
 }
 
@@ -32,7 +49,8 @@ if (!function_exists('getCurrentUserId')) {
      * Lấy ID của người dùng đang đăng nhập
      */
     function getCurrentUserId(): ?int {
-        return isset($_SESSION['nguoidung']['id']) ? (int)$_SESSION['nguoidung']['id'] : null;
+        $u = getCurrentUser();
+        return isset($u['id']) ? (int)$u['id'] : null;
     }
 }
 
@@ -41,7 +59,11 @@ if (!function_exists('isSuperAdmin')) {
      * Kiểm tra có phải là Quản trị viên cấp cao (SuperAdmin - loai = 1)
      */
     function isSuperAdmin(): bool {
-        return isAuthenticated() && (int)($_SESSION['nguoidung']['loai'] ?? 0) === 1;
+        if (!isAuthenticated()) {
+            return false;
+        }
+        $u = getCurrentUser();
+        return (int)($u['loai'] ?? 0) === 1;
     }
 }
 
@@ -50,7 +72,11 @@ if (!function_exists('isTechnician')) {
      * Kiểm tra có phải là Kỹ thuật viên / Nhân viên (Technician - loai = 2)
      */
     function isTechnician(): bool {
-        return isAuthenticated() && (int)($_SESSION['nguoidung']['loai'] ?? 0) === 2;
+        if (!isAuthenticated()) {
+            return false;
+        }
+        $u = getCurrentUser();
+        return (int)($u['loai'] ?? 0) === 2;
     }
 }
 
@@ -62,7 +88,8 @@ if (!function_exists('isAdminOrStaff')) {
         if (!isAuthenticated()) {
             return false;
         }
-        $loai = (int)($_SESSION['nguoidung']['loai'] ?? 0);
+        $u = getCurrentUser();
+        $loai = (int)($u['loai'] ?? 0);
         return $loai === 1 || $loai === 2;
     }
 }
@@ -70,51 +97,85 @@ if (!function_exists('isAdminOrStaff')) {
 if (!function_exists('checkAdminAuth')) {
     /**
      * Bảo vệ toàn bộ khu vực Admin:
-     * - Chưa đăng nhập -> Chuyển hướng về đăng nhập
-     * - Tài khoản bị khóa (trangthai == 0) -> Đăng xuất & chuyển hướng
-     * - Khách hàng thông thường (loai == 3) -> Chặn truy cập
+     * - Chưa đăng nhập -> Chuyển hướng về trang login admin
+     * - Kiểm tra realtime CSDL: Nếu tài khoản bị khóa (trangthai == 0) hoặc bị xóa -> Thu hồi phiên ngay
+     * - Chặn khách hàng thông thường (loai == 3)
+     * - Phân quyền trang: users.php chỉ cho phép SuperAdmin (loai == 1)
      *
      * @param string|null $redirectUrl Đường dẫn chuyển hướng tùy chỉnh
      */
     function checkAdminAuth(?string $redirectUrl = null): void {
-        // Xác định đường dẫn đăng nhập chính xác theo ngữ cảnh thư mục gọi
+        // Xác định đường dẫn đăng nhập chính xác theo cổng đăng nhập hợp nhất
         if ($redirectUrl !== null) {
             $loginUrl = $redirectUrl;
         } else {
             $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
             if (substr($scriptDir, -6) === '/admin') {
-                $loginUrl = 'ktnguoidung/index.php?action=dangnhap';
+                $loginUrl = '../public/index.php?action=dangnhap';
             } elseif (strpos($scriptDir, '/admin/') !== false) {
-                $loginUrl = '../ktnguoidung/index.php?action=dangnhap';
+                $loginUrl = '../../public/index.php?action=dangnhap';
             } else {
-                $loginUrl = 'ktnguoidung/index.php?action=dangnhap';
+                $loginUrl = '../public/index.php?action=dangnhap';
             }
         }
 
+        // 1. Kiểm tra session cơ bản
         if (!isAuthenticated()) {
             setAdminFlash('danger', 'Vui lòng đăng nhập để truy cập khu vực quản trị XAG Store.');
             header("Location: {$loginUrl}");
             exit();
         }
 
-        $user = $_SESSION['nguoidung'];
-
-        // Kiểm tra tài khoản bị khóa
-        if (isset($user['trangthai']) && (int)$user['trangthai'] === 0) {
-            unset($_SESSION['nguoidung']);
-            setAdminFlash('danger', 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Quản trị viên hệ thống!');
+        $userId = getCurrentUserId();
+        if (!$userId) {
+            unset($_SESSION['admin']);
+            setAdminFlash('danger', 'Phiên làm việc không hợp lệ. Vui lòng đăng nhập lại.');
             header("Location: {$loginUrl}");
             exit();
         }
 
-        // Chặn khách hàng thông thường truy cập khu vực nội bộ
-        if ((int)($user['loai'] ?? 0) === 3) {
-            unset($_SESSION['nguoidung']);
-            setAdminFlash('warning', 'Bạn không có quyền truy cập vào bảng điều khiển quản trị!');
-            $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
-            $publicUrl = (substr($scriptDir, -6) === '/admin') ? '../public/index.php' : '../../public/index.php';
-            header("Location: {$publicUrl}");
-            exit();
+        // 2. Truy vấn lại CSDL theo ID để xác nhận trạng thái tài khoản thời gian thực
+        require_once dirname(__DIR__, 2) . '/model/database.php';
+        try {
+            $db = DATABASE::connect();
+            $stmt = $db->prepare("SELECT id, email, hoten, sodienthoai, hinhanh, loai, trangthai FROM nguoidung WHERE id = :id LIMIT 1");
+            $stmt->bindValue(':id', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+            $freshUser = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // Tài khoản không tồn tại hoặc đã bị khóa
+            if (!$freshUser || (int)$freshUser['trangthai'] !== 1) {
+                unset($_SESSION['admin']);
+                setAdminFlash('danger', 'Tài khoản của bạn đã bị khóa hoặc không tồn tại. Vui lòng liên hệ Quản trị viên hệ thống!');
+                header("Location: {$loginUrl}");
+                exit();
+            }
+
+            // Tài khoản khách hàng thông thường không được truy cập Admin
+            if (!in_array((int)$freshUser['loai'], [1, 2], true)) {
+                unset($_SESSION['admin']);
+                setAdminFlash('warning', 'Tài khoản khách hàng không có quyền truy cập khu vực quản trị!');
+                $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
+                $publicUrl = (substr($scriptDir, -6) === '/admin') ? '../public/index.php' : '../../public/index.php';
+                header("Location: {$publicUrl}");
+                exit();
+            }
+
+            // Đồng bộ dữ liệu mới nhất vào Session Admin
+            $_SESSION['admin'] = $freshUser;
+
+            // 3. Phân quyền chi tiết: Trang users.php chỉ dành cho SuperAdmin (loai == 1)
+            $currentScript = basename($_SERVER['SCRIPT_NAME'] ?? '');
+            if ($currentScript === 'users.php' && (int)$freshUser['loai'] !== 1) {
+                setAdminFlash('danger', 'Thao tác bị từ chối! Quản lý nhân sự và phân quyền chỉ dành riêng cho Quản trị viên cấp cao (SuperAdmin).');
+                $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
+                $dashboardUrl = (substr($scriptDir, -6) === '/admin') ? 'index.php' : '../index.php';
+                header("Location: {$dashboardUrl}");
+                exit();
+            }
+
+        } catch (Throwable $e) {
+            // Trường hợp lỗi CSDL tạm thời, cho phép tiếp tục nếu session hợp lệ
         }
     }
 }
@@ -122,7 +183,6 @@ if (!function_exists('checkAdminAuth')) {
 if (!function_exists('requireSuperAdmin')) {
     /**
      * Chặn các thao tác nhạy cảm nếu không phải là SuperAdmin (loai = 1)
-     * (Ví dụ: Xóa sản phẩm, hủy phiếu nhập, quản lý nhân sự, đổi quyền)
      *
      * @param string|null $fallbackUrl
      */

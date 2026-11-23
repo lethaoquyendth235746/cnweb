@@ -2,15 +2,17 @@
 class DONHANG{
 	
 	// Thêm đơn hàng mới, trả về khóa của dòng mới thêm
-	public function themdonhang($nguoidung_id,$diachi_id,$tongtien){
+	public function themdonhang($nguoidung_id,$diachi_id,$tongtien, $phuongthuc = 'COD', $trangthaithanhtoan = 0){
 		$db = DATABASE::connect();
 		try{
-			$sql = "INSERT INTO donhang(nguoidung_id, diachi_id, tongtien, trangthai) 
-					VALUES(:nguoidung_id, :diachi_id, :tongtien, 0)";
+			$sql = "INSERT INTO donhang(nguoidung_id, diachi_id, tongtien, trangthai, phuongthucthanhtoan, trangthaithanhtoan) 
+					VALUES(:nguoidung_id, :diachi_id, :tongtien, 0, :phuongthucthanhtoan, :trangthaithanhtoan)";
 			$cmd = $db->prepare($sql);
 			$cmd->bindValue(':nguoidung_id',$nguoidung_id);			
 			$cmd->bindValue(':diachi_id',$diachi_id);
 			$cmd->bindValue(':tongtien',$tongtien);
+			$cmd->bindValue(':phuongthucthanhtoan',$phuongthuc);
+			$cmd->bindValue(':trangthaithanhtoan',$trangthaithanhtoan, PDO::PARAM_INT);
 			$cmd->execute();
 			$id = $db->lastInsertId();
 			return $id;
@@ -61,7 +63,7 @@ class DONHANG{
      * Đặt hàng an toàn bằng Transaction & Kiểm tra tồn kho trước khi trừ
      * Trạng thái mặc định: 0 (Chờ xác nhận)
      */
-    public function datHangAnToan($nguoidung_id, $diachi_id, $tongtien, $giohang){
+    public function datHangAnToan($nguoidung_id, $diachi_id, $tongtien, $giohang, $phuongthucthanhtoan = 'COD', $trangthaithanhtoan = 0){
         $db = DATABASE::connect();
         try {
             $db->beginTransaction();
@@ -91,13 +93,15 @@ class DONHANG{
                 }
             }
 
-            // 2. Tạo đơn hàng với trangthai = 0 (Chờ xác nhận)
-            $sqlOrder = "INSERT INTO donhang (nguoidung_id, diachi_id, tongtien, trangthai, ngay) 
-                         VALUES (:nguoidung_id, :diachi_id, :tongtien, 0, NOW())";
+            // 2. Tạo đơn hàng với trangthai = 0 (Chờ xác nhận) kèm phương thức & trạng thái thanh toán
+            $sqlOrder = "INSERT INTO donhang (nguoidung_id, diachi_id, tongtien, trangthai, ngay, phuongthucthanhtoan, trangthaithanhtoan) 
+                         VALUES (:nguoidung_id, :diachi_id, :tongtien, 0, NOW(), :phuongthucthanhtoan, :trangthaithanhtoan)";
             $cmdOrder = $db->prepare($sqlOrder);
             $cmdOrder->bindValue(':nguoidung_id', $nguoidung_id);
             $cmdOrder->bindValue(':diachi_id', $diachi_id);
             $cmdOrder->bindValue(':tongtien', $tongtien);
+            $cmdOrder->bindValue(':phuongthucthanhtoan', $phuongthucthanhtoan);
+            $cmdOrder->bindValue(':trangthaithanhtoan', $trangthaithanhtoan, PDO::PARAM_INT);
             $cmdOrder->execute();
             $donhang_id = $db->lastInsertId();
 
@@ -213,6 +217,22 @@ class DONHANG{
                 'success' => false,
                 'message' => 'Lỗi khi hủy đơn hàng: ' . $e->getMessage()
             ];
+        }
+    }
+
+    /**
+     * Cập nhật trạng thái thanh toán (0: Chưa thanh toán, 1: Đã thanh toán)
+     */
+    public function capNhatTrangThaiThanhToan($donhang_id, $trangthaithanhtoan = 1){
+        $db = DATABASE::connect();
+        try {
+            $sql = "UPDATE donhang SET trangthaithanhtoan = :tt WHERE id = :id";
+            $cmd = $db->prepare($sql);
+            $cmd->bindValue(':tt', $trangthaithanhtoan, PDO::PARAM_INT);
+            $cmd->bindValue(':id', $donhang_id, PDO::PARAM_INT);
+            return $cmd->execute();
+        } catch(PDOException $e) {
+            return false;
         }
     }
 }

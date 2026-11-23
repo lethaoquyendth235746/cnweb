@@ -58,7 +58,7 @@ include("inc/top.php");
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center gap-3">
-                                            <img src="../<?php echo htmlspecialchars($mh["hinhanh"]); ?>" 
+                                            <img src="<?php echo lay_hinhanh_mathang($mh["hinhanh"] ?? ""); ?>" 
                                                  alt="<?php echo htmlspecialchars($mh["tenmathang"]); ?>" 
                                                  class="rounded border bg-light" 
                                                  style="width: 60px; height: 60px; object-fit: contain; padding: 4px;">

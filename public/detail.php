@@ -39,7 +39,7 @@ if(!empty($mhct["dongmay"])) {
             <!-- Cột trái: Khung ảnh 1:1 tỉ lệ vuông chuẩn Shopify -->
             <div class="col-lg-5">
                 <div class="pdp-gallery-frame">
-                    <img src="../<?php echo htmlspecialchars($mhct["hinhanh"]); ?>" 
+                    <img src="<?php echo lay_hinhanh_mathang($mhct["hinhanh"] ?? ""); ?>" 
                          alt="<?php echo htmlspecialchars($mhct["tenmathang"]); ?>" 
                          class="img-fluid" />
                 </div>
@@ -163,7 +163,7 @@ if(!empty($mhct["dongmay"])) {
                     <?php endif; ?>
 
                     <a href="index.php?action=detail&id=<?php echo $m["id"]; ?>" class="card-media">
-                        <img src="../<?php echo htmlspecialchars($m["hinhanh"]); ?>" 
+                        <img src="<?php echo lay_hinhanh_mathang($m["hinhanh"] ?? ""); ?>" 
                              alt="<?php echo htmlspecialchars($m["tenmathang"]); ?>" 
                              loading="lazy" />
                     </a>

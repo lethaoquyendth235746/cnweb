@@ -11,6 +11,7 @@ checkAdminAuth();
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/services/ProductAdminService.php';
 require_once __DIR__ . '/services/CategoryAdminService.php';
+require_once __DIR__ . '/../model/mathang.php';
 
 $productService = new ProductAdminService();
 $categoryService = new CategoryAdminService();
@@ -262,7 +263,7 @@ require_once __DIR__ . '/inc/layout_header.php';
                         </tr>
                     <?php else: ?>
                         <?php foreach ($products as $p): 
-                            $imgUrl = !empty($p['hinhanh']) ? '../images/products/' . basename($p['hinhanh']) : '../images/products/no-image.png';
+                            $imgUrl = MATHANG::layHinhAnh($p['hinhanh'], '../');
                             $ton = (int)$p['soluongton'];
                         ?>
                             <tr class="table-hover-row transition-colors">
@@ -603,7 +604,7 @@ function openEditModal(prod) {
 
     const imgPreview = document.getElementById('product-img-preview');
     if (prod.hinhanh) {
-        imgPreview.src = '../images/products/' + prod.hinhanh.split('/').pop();
+        imgPreview.src = prod.hinhanh.indexOf('images/') === 0 ? ('../' + prod.hinhanh) : ('../images/products/' + prod.hinhanh.split('/').pop());
     } else {
         imgPreview.src = '../images/products/no-image.png';
     }

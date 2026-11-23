@@ -85,7 +85,7 @@ include("inc/top.php");
                 foreach($items as $m): 
                     $model_tag = !empty($m["dongmay"]) ? $m["dongmay"] : "XAG Drone";
                     $is_in_stock = isset($m["soluongton"]) && ((int)$m["soluongton"] > 0);
-                    $img_src = (!empty($m["hinhanh"])) ? "../" . htmlspecialchars($m["hinhanh"]) : "../images/logo.png";
+                    $img_src = lay_hinhanh_mathang($m["hinhanh"] ?? "");
                 ?>
                 <div class="col">
                     <div class="shopify-card">

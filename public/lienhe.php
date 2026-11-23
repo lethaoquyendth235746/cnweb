@@ -1,5 +1,7 @@
 <?php
 include("inc/top.php");
+$userHoten = isset($_SESSION['khachhang']['hoten']) ? $_SESSION['khachhang']['hoten'] : '';
+$userDienthoai = isset($_SESSION['khachhang']['dienthoai']) ? $_SESSION['khachhang']['dienthoai'] : (isset($_SESSION['khachhang']['sodienthoai']) ? $_SESSION['khachhang']['sodienthoai'] : '');
 ?>
 
 <!-- Breadcrumb -->
@@ -53,33 +55,50 @@ include("inc/top.php");
                 <h2 class="h5 fw-bold text-dark text-uppercase mb-2">GỬI YÊU CẦU TƯ VẤN SẢN PHẨM</h2>
                 <p class="text-muted small mb-4">Để lại thông tin về mã sản phẩm phụ tùng cần tìm hoặc mô tả tình trạng máy bay của bạn:</p>
 
-                <form onsubmit="alert('Cảm ơn bạn! Đội ngũ kỹ thuật LPT DRONE sẽ gọi lại tư vấn trong ít phút.'); return false;">
+                <?php if (isset($_SESSION['lienhe_flash'])): ?>
+                    <div class="alert alert-<?php echo $_SESSION['lienhe_flash']['type']; ?> alert-dismissible fade show mb-4" role="alert">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi <?php echo $_SESSION['lienhe_flash']['type'] === 'success' ? 'bi-check-circle-fill text-success fs-5' : 'bi-exclamation-triangle-fill text-danger fs-5'; ?>"></i>
+                            <div><?php echo htmlspecialchars($_SESSION['lienhe_flash']['message']); ?></div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <?php unset($_SESSION['lienhe_flash']); ?>
+                <?php endif; ?>
+
+                <form action="index.php?action=guilienhe" method="POST">
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold text-secondary">Họ và tên của bạn:</label>
-                            <input type="text" class="form-control" placeholder="Ví dụ: Anh Ba An Giang" required>
+                            <label class="form-label small fw-semibold text-secondary">Họ và tên của bạn: <span class="text-danger">*</span></label>
+                            <input type="text" name="hoten" class="form-control" placeholder="Ví dụ: Anh Ba An Giang" value="<?php echo htmlspecialchars($userHoten); ?>" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold text-secondary">Số điện thoại liên hệ:</label>
-                            <input type="tel" class="form-control" placeholder="0833 xxx xxx" required>
+                            <label class="form-label small fw-semibold text-secondary">Số điện thoại liên hệ: <span class="text-danger">*</span></label>
+                            <input type="tel" name="sodienthoai" class="form-control" placeholder="0833 xxx xxx" value="<?php echo htmlspecialchars($userDienthoai); ?>" required>
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label small fw-semibold text-secondary">Dòng máy bay bạn đang vận hành:</label>
-                        <select class="form-select">
-                            <option>XAG P100 Pro</option>
-                            <option>XAG P100</option>
-                            <option>XAG P40</option>
-                            <option>XAG V40</option>
-                            <option>Robot tự hành XAG R150</option>
-                            <option>Khác...</option>
+                        <select name="dongmay" class="form-select">
+                            <?php if (!empty($dongmay_list) && is_array($dongmay_list)): ?>
+                                <?php foreach ($dongmay_list as $dm_item): ?>
+                                    <option value="XAG <?php echo htmlspecialchars($dm_item['tendongmay']); ?>">XAG <?php echo htmlspecialchars($dm_item['tendongmay']); ?></option>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <option value="XAG P100 Pro">XAG P100 Pro</option>
+                                <option value="XAG P100">XAG P100</option>
+                                <option value="XAG P40">XAG P40</option>
+                                <option value="XAG V40">XAG V40</option>
+                                <option value="Robot tự hành XAG R150">Robot tự hành XAG R150</option>
+                            <?php endif; ?>
+                            <option value="Khác">Dòng máy bay khác...</option>
                         </select>
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label small fw-semibold text-secondary">Sản phẩm cần tìm hoặc tình trạng sự cố:</label>
-                        <textarea class="form-control" rows="4" placeholder="Ví dụ: Cần mua cánh 47 inch cho P100 Pro hoặc cần kiểm tra bo mạch SuperX 4..." required></textarea>
+                        <label class="form-label small fw-semibold text-secondary">Sản phẩm cần tìm hoặc tình trạng sự cố: <span class="text-danger">*</span></label>
+                        <textarea name="noidung" class="form-control" rows="4" placeholder="Ví dụ: Cần mua cánh 47 inch cho P100 Pro hoặc cần kiểm tra bo mạch SuperX 4..." required></textarea>
                     </div>
 
                     <button type="submit" class="btn btn-danger btn-lg w-100 fw-bold py-3 text-uppercase">

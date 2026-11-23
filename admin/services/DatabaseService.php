@@ -51,6 +51,20 @@ class DatabaseService {
                 } catch (Exception $e) {
                     error_log('Init dongmay schema failed: ' . $e->getMessage());
                 }
+
+                // Tự động kiểm tra và bổ sung cột thanh toán VietQR cho bảng donhang nếu chưa tồn tại
+                try {
+                    $this->initPaymentSchema();
+                } catch (Exception $e) {
+                    error_log('Init payment schema failed: ' . $e->getMessage());
+                }
+
+                // Tự động kiểm tra và khởi tạo bảng lienhe nếu chưa tồn tại
+                try {
+                    $this->initLienHeSchema();
+                } catch (Exception $e) {
+                    error_log('Init lienhe schema failed: ' . $e->getMessage());
+                }
             }
         } catch (PDOException $e) {
             throw new RuntimeException("Lỗi kết nối CSDL XAG Store: " . $e->getMessage(), (int)$e->getCode(), $e);
@@ -184,5 +198,43 @@ class DatabaseService {
                 $insertStmt->execute([':tendongmay' => $model]);
             }
         }
+    }
+
+    /**
+     * Tự động kiểm tra và bổ sung cột phuongthucthanhtoan và trangthaithanhtoan vào bảng donhang
+     */
+    private function initPaymentSchema(): void {
+        try {
+            $stmt = $this->pdo->query("SHOW COLUMNS FROM `donhang` LIKE 'phuongthucthanhtoan'");
+            if (!$stmt->fetch()) {
+                $this->pdo->exec("ALTER TABLE `donhang` ADD COLUMN `phuongthucthanhtoan` VARCHAR(50) NOT NULL DEFAULT 'COD'");
+            }
+
+            $stmt2 = $this->pdo->query("SHOW COLUMNS FROM `donhang` LIKE 'trangthaithanhtoan'");
+            if (!$stmt2->fetch()) {
+                $this->pdo->exec("ALTER TABLE `donhang` ADD COLUMN `trangthaithanhtoan` TINYINT(1) NOT NULL DEFAULT 0");
+            }
+        } catch (Throwable $e) {
+            error_log('Init payment schema error: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Tự động khởi tạo cấu trúc bảng lienhe (tư vấn kỹ thuật & liên hệ) nếu chưa tồn tại
+     */
+    private function initLienHeSchema(): void {
+        $sql = "CREATE TABLE IF NOT EXISTS `lienhe` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `nguoidung_id` int(11) DEFAULT NULL COMMENT 'ID khách nếu đã đăng nhập, NULL nếu khách vãng lai',
+            `hoten` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+            `sodienthoai` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+            `dongmay` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            `noidung` text COLLATE utf8mb4_unicode_ci NOT NULL,
+            `trangthai` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0: Chờ tư vấn, 1: Đã xử lý',
+            `ghichu_admin` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            `ngaygui` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+        $this->pdo->exec($sql);
     }
 }

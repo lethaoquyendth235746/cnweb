@@ -370,6 +370,13 @@ class ProductAdminService {
             throw new RuntimeException("Kích thước tệp ảnh vượt quá giới hạn cho phép (tối đa 5MB).");
         }
 
+        // Kiểm tra phần mở rộng tệp chuẩn web (jpg, jpeg, png, webp)
+        $rawExt = strtolower(pathinfo($file['name'] ?? '', PATHINFO_EXTENSION));
+        $allowedExts = ['jpg', 'jpeg', 'png', 'webp'];
+        if (!in_array($rawExt, $allowedExts, true)) {
+            throw new RuntimeException("Phần mở rộng tệp không được hỗ trợ (.{$rawExt}). Chỉ cho phép tải lên các định dạng chuẩn web: JPG, JPEG, PNG, WEBP.");
+        }
+
         // Kiểm tra loại tệp an toàn bằng finfo
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         $mime = $finfo->file($file['tmp_name']);
@@ -382,7 +389,7 @@ class ProductAdminService {
         ];
 
         if (!isset($allowedMimes[$mime])) {
-            throw new RuntimeException("Định dạng tệp không được hỗ trợ ({$mime}). Chỉ chấp nhận JPG, PNG hoặc WEBP.");
+            throw new RuntimeException("Định dạng tệp không được hỗ trợ ({$mime}). Chỉ chấp nhận JPG, JPEG, PNG hoặc WEBP.");
         }
 
         $ext = $allowedMimes[$mime];

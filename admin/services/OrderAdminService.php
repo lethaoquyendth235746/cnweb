@@ -87,6 +87,7 @@ class OrderAdminService {
         $offset = isset($filters['offset']) ? max(0, (int)$filters['offset']) : 0;
 
         $sql = "SELECT dh.id, dh.nguoidung_id, dh.diachi_id, dh.ngay, dh.tongtien, dh.ghichu, dh.trangthai,
+                       dh.phuongthucthanhtoan, dh.trangthaithanhtoan,
                        nd.hoten, nd.sodienthoai, nd.email,
                        dc.diachi AS diachi_chitiet
                 FROM donhang dh
@@ -155,6 +156,7 @@ class OrderAdminService {
         $pdo = DatabaseService::pdo();
 
         $sql = "SELECT dh.id, dh.nguoidung_id, dh.diachi_id, dh.ngay, dh.tongtien, dh.ghichu, dh.trangthai,
+                       dh.phuongthucthanhtoan, dh.trangthaithanhtoan,
                        nd.hoten, nd.sodienthoai, nd.email,
                        dc.diachi AS diachi_chitiet
                 FROM donhang dh
@@ -321,7 +323,7 @@ class OrderAdminService {
             $finalNote = $order['ghichu'] ?? '';
             if (!empty($adminNote)) {
                 $timeTag = date('H:i d/m/Y');
-                $user = $_SESSION['nguoidung']['hoten'] ?? 'Admin';
+                $user = $_SESSION['admin']['hoten'] ?? $_SESSION['nguoidung']['hoten'] ?? 'Admin';
                 $append = "[{$timeTag} - {$user}]: {$adminNote}";
                 $finalNote = !empty($finalNote) ? $finalNote . "\n" . $append : $append;
             }
@@ -337,6 +339,65 @@ class OrderAdminService {
             $stmtUpdateOrder->bindValue(':ghichu', $finalNote, PDO::PARAM_STR);
             $stmtUpdateOrder->bindValue(':id', $orderId, PDO::PARAM_INT);
             $stmtUpdateOrder->execute();
+
+            DatabaseService::commit();
+            return true;
+
+        } catch (Exception $e) {
+            DatabaseService::rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Xác nhận đã nhận tiền thanh toán VietQR cho đơn hàng
+     * Cập nhật trangthaithanhtoan = 1
+     * Nếu đơn hàng đang ở trạng thái 0 (Chờ xác nhận), tự động nâng sang 1 (Đã xác nhận & Chờ đóng gói)
+     *
+     * @param int $orderId
+     * @param string|null $adminNote
+     * @return bool
+     * @throws DomainException|Exception
+     */
+    public function confirmVietQRPayment(int $orderId, ?string $adminNote = null): bool {
+        $pdo = DatabaseService::pdo();
+        DatabaseService::beginTransaction();
+
+        try {
+            $stmtOrder = $pdo->prepare("SELECT * FROM donhang WHERE id = :id FOR UPDATE");
+            $stmtOrder->bindValue(':id', $orderId, PDO::PARAM_INT);
+            $stmtOrder->execute();
+            $order = $stmtOrder->fetch();
+
+            if (!$order) {
+                throw new DomainException("Đơn hàng #{$orderId} không tồn tại trong hệ thống.");
+            }
+
+            $currentStatus = (int)$order['trangthai'];
+            // Tự động nâng trạng thái từ 0 -> 1 nếu đang chờ xác nhận
+            $newStatus = ($currentStatus === 0) ? 1 : $currentStatus;
+
+            // Ghi chú hệ thống
+            $finalNote = $order['ghichu'] ?? '';
+            $timeTag = date('H:i d/m/Y');
+            $user = $_SESSION['admin']['hoten'] ?? $_SESSION['nguoidung']['hoten'] ?? 'Admin';
+            $confirmMsg = "[{$timeTag} - {$user}]: Xác nhận đã nhận tiền chuyển khoản VietQR thành công.";
+            if (!empty($adminNote)) {
+                $confirmMsg .= " Ghi chú: " . $adminNote;
+            }
+            $finalNote = !empty($finalNote) ? $finalNote . "\n" . $confirmMsg : $confirmMsg;
+
+            $stmtUpdate = $pdo->prepare(
+                "UPDATE donhang 
+                 SET trangthaithanhtoan = 1, 
+                     trangthai = :trangthai, 
+                     ghichu = :ghichu 
+                 WHERE id = :id"
+            );
+            $stmtUpdate->bindValue(':trangthai', $newStatus, PDO::PARAM_INT);
+            $stmtUpdate->bindValue(':ghichu', $finalNote, PDO::PARAM_STR);
+            $stmtUpdate->bindValue(':id', $orderId, PDO::PARAM_INT);
+            $stmtUpdate->execute();
 
             DatabaseService::commit();
             return true;

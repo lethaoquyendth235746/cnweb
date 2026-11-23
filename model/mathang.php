@@ -478,5 +478,44 @@ class MATHANG{
         }
     }
 
+    /**
+     * Chuẩn hóa đường dẫn ảnh sản phẩm: tự động tìm kiếm trong images/products/, images/sanpham/, images/
+     * và trả về đường dẫn ảnh thực tế tồn tại (file_exists) hoặc ảnh dự phòng mặc định.
+     */
+    public static function layHinhAnh($hinhanh, $prefix = '../') {
+        $placeholder = $prefix . 'images/products/no-image.png';
+
+        if (empty($hinhanh)) {
+            return $placeholder;
+        }
+
+        $rootDir = dirname(__DIR__);
+        $clean = ltrim(str_replace(['\\'], '/', $hinhanh), '/');
+        $baseName = basename($clean);
+
+        // Các đường dẫn tương đối có thể tồn tại trên đĩa
+        $candidates = [
+            $clean,
+            'images/products/' . $baseName,
+            'images/sanpham/' . $baseName,
+            'images/' . $baseName
+        ];
+
+        foreach ($candidates as $relPath) {
+            $fullPath = $rootDir . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relPath);
+            if (file_exists($fullPath) && is_file($fullPath)) {
+                return $prefix . $relPath;
+            }
+        }
+
+        return $placeholder;
+    }
+
+}
+
+if (!function_exists('lay_hinhanh_mathang')) {
+    function lay_hinhanh_mathang($hinhanh, $prefix = '../') {
+        return MATHANG::layHinhAnh($hinhanh, $prefix);
+    }
 }
 ?>

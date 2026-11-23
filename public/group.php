@@ -444,7 +444,7 @@ function build_page_filter_url($override = []) {
 <!-- =========================================================================
      1. BANNER TIÊU ĐỀ ĐẦU TRANG (FULL-WIDTH HERO BANNER, NẰM NGOÀI KHUNG 2 CỘT)
      ========================================================================= -->
-<section style="width: 100%; min-height: 180px; background: linear-gradient(rgba(24, 24, 27, 0.82), rgba(24, 24, 27, 0.88)), url('../images/logo.png') center/contain no-repeat, #18181B; display: flex; align-items: center; justify-content: center; text-align: center; padding: 40px 16px;">
+<section style="width: 100%; min-height: 180px; background: linear-gradient(rgba(17, 19, 21, 0.78), rgba(17, 19, 21, 0.85)), url('../images/products/mach_fc_superx4_pro.jpg') center/cover no-repeat, #18181B; display: flex; align-items: center; justify-content: center; text-align: center; padding: 40px 16px;">
     <div style="max-width: 920px; margin: 0 auto;">
         <h1 style="color: #FFFFFF; font-size: 30px; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.5px; text-transform: uppercase;">
             <?php echo htmlspecialchars($page_title); ?>
@@ -657,7 +657,7 @@ function build_page_filter_url($override = []) {
                 foreach($mathang as $m):
                     $model_tag = !empty($m["dongmay"]) ? $m["dongmay"] : "XAG Drone";
                     $is_in_stock = isset($m["soluongton"]) && ((int)$m["soluongton"] > 0);
-                    $img_src = (!empty($m["hinhanh"])) ? "../" . htmlspecialchars($m["hinhanh"]) : "../images/logo.png";
+                    $img_src = lay_hinhanh_mathang($m["hinhanh"] ?? "");
             ?>
             <div class="lpt-product-card">
                 <!-- Badges -->

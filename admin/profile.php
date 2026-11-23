@@ -52,9 +52,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute();
 
             // Cập nhật lại Session
-            $_SESSION['nguoidung']['hoten'] = $hoten;
-            $_SESSION['nguoidung']['sodienthoai'] = $sodt;
-            $_SESSION['nguoidung']['hinhanh'] = $hinhanh;
+            if (isset($_SESSION['admin'])) {
+                $_SESSION['admin']['hoten'] = $hoten;
+                $_SESSION['admin']['sodienthoai'] = $sodt;
+                $_SESSION['admin']['hinhanh'] = $hinhanh;
+            }
+            if (isset($_SESSION['nguoidung'])) {
+                $_SESSION['nguoidung']['hoten'] = $hoten;
+                $_SESSION['nguoidung']['sodienthoai'] = $sodt;
+                $_SESSION['nguoidung']['hinhanh'] = $hinhanh;
+            }
 
             setAdminFlash('success', 'Đã cập nhật hồ sơ cá nhân thành công!');
         } catch (Throwable $e) {
